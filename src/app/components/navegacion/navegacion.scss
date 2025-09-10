@@ -1,0 +1,46 @@
+.menu{
+    display: flex;
+    justify-content: space-between;
+    background-color: #151515;
+    padding: 5px 30px;
+}
+
+// ::ng-deep .p-popover {
+//     --p-popover-arrow-left: 65px !important;
+// }
+
+
+.color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.5s ease;
+
+  span{
+    font-size: 30px;
+  }
+
+  &:hover {
+    transform: scale(1.2);
+  }
+
+  &.selected {
+    padding: 2px;
+    border: 3px solid #b0b0b0;
+  };
+}

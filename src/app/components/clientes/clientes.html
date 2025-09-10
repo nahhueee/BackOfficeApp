@@ -1,0 +1,34 @@
+<div class="contenedor">
+    <p-button label="Nuevo Cliente" [raised]="true" severity="primary" class="" />
+
+    <div class="tabla">
+        <p-table [value]="clientes"
+        [tableStyle]="{ 'min-width': '60rem' }"
+        [paginator]="true"
+        [rows]="10"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        >
+            <ng-template #header>
+                <tr>
+                    <th>DNI</th>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Estado</th>
+                </tr>
+            </ng-template>
+            <ng-template #body let-cliente>
+                <tr>
+                    <td>{{ cliente.DNI }}</td>
+                    <td>{{ cliente.nombre }}</td>
+                    <td>{{ cliente.descripcion }}</td>
+                    <td class="acciones">
+                        <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil">
+                            <!-- <mat-icon>edit</mat-icon> -->
+                        </p-button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

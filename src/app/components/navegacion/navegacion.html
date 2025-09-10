@@ -1,0 +1,29 @@
+<div class="menu">
+    <div class="logo">
+
+    </div>
+    <div class="items">
+        <p-button label="Inicio" styleClass="p-button-text" (onClick)="Navegar('inicio')" icon="pi pi-home"/>
+        <p-button label="Apps" variant="text" (onClick)="Navegar('apps')" icon="pi pi-desktop"/>
+        <p-button label="Clientes" variant="text" (onClick)="Navegar('clientes')" icon="pi pi-users"/>
+    </div>
+    <div class="tema">
+        <p-button [rounded]="true" [text]="true" (onClick)="CambiarModo()" [icon]="esDark ? 'pi pi-sun' : 'pi pi-moon'"/>
+        <p-button [rounded]="true" [text]="true" (onClick)="toggle($event)" icon="pi pi-palette"/>
+    </div>
+</div>
+
+<p-popover #op>
+    <div class="color-grid">
+        @for (item of colores; track $index) {
+            <div
+                class="color-box"
+                [class.selected]="colorSeleccionado === item.color"
+                (click)="CambiarColor(item.color)"
+                [style]="{ backgroundColor: item.hexa }"
+                [pTooltip]="item.color"
+                tooltipPosition="bottom"
+            ></div>
+        }
+    </div>
+</p-popover>

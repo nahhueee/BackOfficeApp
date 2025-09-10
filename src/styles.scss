@@ -1,1 +1,150 @@
-/* You can add global styles to this file, and also import other style files */
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+@import "primeicons/primeicons.css";
+
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+
+
+
+
+:root {
+  /* Paleta Zinc - Modo claro */
+  --zinc-50: #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --zinc-950: #09090b;
+
+  /* Surface colors para modo claro - Usando Zinc */
+  --surface-a: var(--zinc-100);    /* Fondo principal */
+  --surface-b: var(--zinc-100);   /* Fondo secundario */
+  --surface-c: var(--zinc-200);   /* Fondo terciario (hover) */
+  --surface-d: var(--zinc-300);   /* Bordes */
+  --surface-e: var(--zinc-50);    /* Surface de cards */
+  --surface-f: var(--zinc-100);   /* Overlays */
+  
+  /* Colores de texto para modo claro */
+  --text-color: var(--zinc-900);
+  --text-color-secondary: var(--zinc-600);
+  --primary-color-text: #ffffff;
+}
+
+/* Modo oscuro con Zinc */
+html.dark-mode {
+  /* Surface colors para modo oscuro - Zinc invertido */
+  --surface-a: var(--zinc-950);   /* Fondo principal oscuro */
+  --surface-b: var(--zinc-800);   /* Fondo secundario oscuro */
+  --surface-c: var(--zinc-700);   /* Fondo terciario oscuro */
+  --surface-d: var(--zinc-600);   /* Bordes oscuros */
+  --surface-e: var(--zinc-800);   /* Surface de cards oscuro */
+  --surface-f: var(--zinc-900);   /* Overlays oscuros */
+  
+  /* Colores de texto para modo oscuro */
+  --text-color: var(--zinc-100);
+  --text-color-secondary: var(--zinc-400);
+}
+
+/* Aplicar a todo el cuerpo y componentes */
+body {
+  background-color: var(--surface-a) !important;
+  color: var(--text-color) !important;
+  transition: all 0.3s ease;
+}
+
+/* Transiciones suaves */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+
+
+//#region FONTS
+@font-face {
+  font-family: "Poppins";
+  src: url('../public/fonts/Poppins.ttf') format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Roboto";
+  src: url('../public/fonts/Roboto.ttf') format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+//#endregion
+
+body{
+    font-family: 'Roboto', sans-serif;
+    padding: 0%;
+    margin: 0%;
+};
+
+mat-icon {
+  font-family: 'Material Symbols Outlined' !important;
+  font-size: 18px !important;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  vertical-align: middle;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 100,
+    'GRAD' -25,
+    'opsz' 20 !important;
+}
+
+p-button.icon-only button {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  mat-icon {
+    margin-top: 6px;
+    margin-left: 2px;
+    font-size: 20px;
+  }
+}
+
+
+
+
+
