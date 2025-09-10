@@ -1,5 +1,10 @@
 <div class="contenedor">
-    <p-button label="Nuevo Cliente" [raised]="true" severity="primary" class="" />
+    <p-button 
+    label="Nuevo Cliente"  
+    size="small" 
+    icon="pi pi-plus" 
+    severity="primary"
+    (onClick)="Agregar()"/>
 
     <div class="tabla">
         <p-table [value]="clientes"
@@ -19,7 +24,7 @@
                     <th>Nombre</th>
                     <th>Descripcion</th>
                     <th>Alta</th>
-                    <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
             </ng-template>
             <ng-template #body let-cliente>
@@ -29,10 +34,24 @@
                     <td>{{ cliente.descripcion }}</td>
                     <td>{{ cliente.fechaAlta | date: 'dd/MM/yyyy' }}</td>
                     <td class="acciones">
-                        <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" />
+                        <p-button severity="primary" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-id-card" (onClick)="Navegar(cliente.DNI)" pTooltip="Detalles" tooltipPosition="bottom" />
+                        <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" (onClick)="Editar(cliente.DNI)" pTooltip="Editar" tooltipPosition="bottom"/>
                     </td>
                 </tr>
             </ng-template>
         </p-table>
     </div>
 </div>
+
+<!-- Modal Agregar Editar -->
+<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '30rem' }">
+    <ng-template #header>
+        <div class="modal-header">
+            <i class="pi pi-user"></i>
+            <span>
+                {{ clienteSeleccionado ? 'Editar Cliente' : 'Agregar Cliente' }}
+            </span>
+        </div>
+    </ng-template>
+    <app-addmod-clientes [cliente]="clienteSeleccionado" (cerrar)="Actualizar($event)"/>
+</p-dialog>

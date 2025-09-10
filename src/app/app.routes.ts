@@ -12,7 +12,11 @@ export const routes: Routes = [
     },
     {
         path: 'clientes',
-        loadComponent: () => import('./components/clientes/clientes').then(m => m.Clientes)
+        loadComponent: () => import('./components/clientes/main-clientes/main-clientes').then(m => m.Clientes)
+    },
+    {
+        path: 'clientes/detalles/:idCliente',
+        loadComponent: () => import('./components/clientes/detalle-clientes/detalle-clientes').then(m => m.DetalleClientes)
     },
     {
         path: 'apps',

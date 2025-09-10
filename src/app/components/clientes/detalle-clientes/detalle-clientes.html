@@ -1,0 +1,45 @@
+<div class="contenido">
+    <div class="izq">
+        <div class="tarjeta">
+            <i class="pi pi-user"></i>
+
+            <div class="datos">
+                <h5>{{cliente.nombre}}</h5>
+                <span>{{cliente.DNI}}</span>
+                <p>{{cliente.descripcion}}</p>
+            </div>
+                
+            <p-button 
+            label="Editar Datos"  
+            size="small" 
+            icon="pi pi-pencil" 
+            severity="primary"
+            (onClick)="EditarDatos()"/>
+        </div>
+
+        @for (item of cliente.apps; track $index) {
+            <div class="app">
+                <div class="enLinea">
+                    <h5>{{item.app?.nombre}}</h5>
+                    <span 
+                    [pTooltip]="item.habilitado ? 'Habilitado' : 'Deshabilitado'" 
+                    tooltipPosition="bottom">
+
+                    <i 
+                        class="pi" [ngClass]="item.habilitado ? 'pi-check-circle habilitado' : 'pi-times-circle deshabilitado'">
+                    </i>
+
+                    </span>
+                </div>
+
+                <p>Versión App: <span>{{item.app?.version}}</span></p>
+                <p>Versión Cliente: <span>{{item.version}}</span></p>
+                <p>Actualizado: <span>{{item.actualizacion | date:'dd/MM/yyyy hh:mm'}}</span></p>
+            </div>
+        }
+
+    </div>
+    <div class="der">
+
+    </div>
+</div>

@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FiltroGral } from '../models/FiltroGral';
-import { Cliente } from '../models/Cliente';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
+import { Cliente } from '../models/Cliente';
 
 @Injectable({
   providedIn: 'root'

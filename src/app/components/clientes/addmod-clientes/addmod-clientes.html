@@ -1,0 +1,33 @@
+<form autocomplete="off" class="formulario" [formGroup]="formulario" (keyup.enter)='Guardar()'>
+    <p-floatlabel variant="in">
+        <input pInputText formControlName="DNI" />
+        <label>DNI</label>
+
+        @if(campoInvalido('DNI')){
+            <small class="error">DNI es requerido.</small>
+        }
+    </p-floatlabel>
+
+    <p-floatlabel variant="in">
+        <input pInputText formControlName="nombre" />
+        <label>Nombre</label>
+        @if(campoInvalido('nombre')){
+            <small class="error">Nombre es requerido.</small>
+        }
+    </p-floatlabel>
+
+    <p-floatlabel variant="in">
+        <input pInputText formControlName="email" />
+        <label>Email</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="in">
+        <input pInputText formControlName="descripcion" />
+        <label>Descripción</label>
+    </p-floatlabel>
+</form>
+
+<div class="botones">
+    <p-button label="Cancelar" severity="secondary" (click)="CerrarModal(false)" />
+    <p-button label="Guardar" (onClick)="Guardar()" />
+</div>

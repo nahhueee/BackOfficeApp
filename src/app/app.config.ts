@@ -1,25 +1,37 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
 import { YellowPreset } from './themes/yellow';
-import { provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { MessageService } from 'primeng/api';
+import { HttpErrorHandlerService } from './services/http-error-handler.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(), 
+
+    // HttpClient con soporte para interceptores
+    provideHttpClient(withInterceptorsFromDi()), 
+
+    // Servicios
+    MessageService,
+
+    // Interceptor de errores
+    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorHandlerService, multi: true },
+
+    // Animaciones y PrimeNG
     provideAnimationsAsync(),
     providePrimeNG({
-        theme: {
-            preset: YellowPreset,
-            options: {
-                darkModeSelector: '.dark-mode'
-            }
+      theme: {
+        preset: YellowPreset,
+        options: {
+          darkModeSelector: '.dark-mode'
         }
+      }
     })
   ]
 };

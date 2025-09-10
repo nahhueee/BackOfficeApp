@@ -50,6 +50,8 @@ body {
   --zinc-800: #27272a;
   --zinc-900: #18181b;
   --zinc-950: #09090b;
+  --red-500: #ef4444;
+
 
   /* Surface colors para modo claro - Usando Zinc */
   --surface-a: var(--zinc-100);    /* Fondo principal */
@@ -63,6 +65,7 @@ body {
   --text-color: var(--zinc-900);
   --text-color-secondary: var(--zinc-600);
   --primary-color-text: #ffffff;
+  --p-floatlabel-on-active-background: var(--zinc-100);
 }
 
 /* Modo oscuro con Zinc */
@@ -78,6 +81,7 @@ html.dark-mode {
   /* Colores de texto para modo oscuro */
   --text-color: var(--zinc-100);
   --text-color-secondary: var(--zinc-400);
+  --p-floatlabel-on-active-background: var(--zinc-900);
 }
 
 /* Aplicar a todo el cuerpo y componentes */
@@ -115,6 +119,45 @@ body{
     margin: 0%;
 };
 
+p{
+  margin: 0%;
+}
+h1{
+  margin: 0%;
+}
+h2{
+  margin: 0%;
+}
+h3{
+  margin: 0%;
+}
+h4{
+  margin: 0%;
+}
+h5{
+  margin: 0%;
+}
+h6{
+  margin: 0%;
+}
+
+.modal-header{
+  display: flex;
+  gap: 10px;
+  margin-left: 2px;
+  font-size: 17px;
+}
+
+.error{
+  margin-left: 13px;
+  color: var(--red-500);
+}
+
+.acciones{
+  display: flex;
+  gap: 8px;
+}
+
 mat-icon {
   font-family: 'Material Symbols Outlined' !important;
   font-size: 18px !important;
@@ -144,6 +187,33 @@ p-button.icon-only button {
   }
 }
 
+// #region TOAST
+.p-toast-detail{
+  color: #fff !important;
+}
+.p-toast-message-success{
+  background-color: #23c45ed5 !important; 
+  border-color: transparent !important;
+  color: #fff !important;
+}
+.p-toast-message-info {
+  background-color: #0fa4e9d8 !important;
+  border-color: transparent !important; 
+  color: #fff !important;
+}
+
+.p-toast-message-warn {
+  background-color: #f97117db !important; 
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+.p-toast-message-error {
+  background-color: #ee4444d9 !important; 
+  border-color: transparent !important;
+  color: #fff !important;
+}
+//#endregion
 
 
 

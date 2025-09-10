@@ -1,17 +1,23 @@
-export class Cliente{
-    id: number;
-    DNI: number;
-    nombre: string;
-    email: string;
-    descripcion: string;
-    fechaAlta: Date;
+import { AppCliente } from "./AppsCliente";
 
-    constructor(data: any){
-        this.id = data.id;
-        this.DNI = data.DNI;
-        this.nombre = data.nombre;
-        this.email = data.email;
-        this.descripcion = data.descripcion;
-        this.fechaAlta = data.fechaAlta;
+export class Cliente {
+    id?:number;
+    nombre?:string;
+    DNI?:string;
+    email?:string;
+    descripcion?:string;
+    fechaAlta?:Date;
+    apps:AppCliente[] = [];
+
+    constructor(data?: any) {
+        if (data) {
+          this.id = data.id;
+          this.nombre = data.nombre;
+          this.DNI = data.DNI;
+          this.email = data.email;
+          this.descripcion = data.descripcion;
+          this.fechaAlta = data.fechaAlta;
+          this.apps = data.apps;
+        }
     }
 }
