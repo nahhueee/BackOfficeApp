@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FiltroGral } from '../models/filtros/FiltroGral';
+import { FiltroGral } from '../models/FiltroGral';
 import { Cliente } from '../models/Cliente';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';

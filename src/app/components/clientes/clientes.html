@@ -3,17 +3,22 @@
 
     <div class="tabla">
         <p-table [value]="clientes"
-        [tableStyle]="{ 'min-width': '60rem' }"
+        [value]="clientes"
+        [lazy]="true"
         [paginator]="true"
         [rows]="10"
-        [tableStyle]="{ 'min-width': '50rem' }"
-        [rowsPerPageOptions]="[10, 20, 50]"
+        [totalRecords]="totalRecords"
+        (onLazyLoad)="Buscar($event)"
+        [loading]="loading"
+        [rowsPerPageOptions]="[10,20,50]"
+        [tableStyle]="{ 'min-width': '60rem' }">
         >
             <ng-template #header>
                 <tr>
                     <th>DNI</th>
                     <th>Nombre</th>
                     <th>Descripcion</th>
+                    <th>Alta</th>
                     <th>Estado</th>
                 </tr>
             </ng-template>
@@ -22,10 +27,9 @@
                     <td>{{ cliente.DNI }}</td>
                     <td>{{ cliente.nombre }}</td>
                     <td>{{ cliente.descripcion }}</td>
+                    <td>{{ cliente.fechaAlta | date: 'dd/MM/yyyy' }}</td>
                     <td class="acciones">
-                        <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil">
-                            <!-- <mat-icon>edit</mat-icon> -->
-                        </p-button>
+                        <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" />
                     </td>
                 </tr>
             </ng-template>

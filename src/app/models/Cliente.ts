@@ -4,6 +4,7 @@ export class Cliente{
     nombre: string;
     email: string;
     descripcion: string;
+    fechaAlta: Date;
 
     constructor(data: any){
         this.id = data.id;
@@ -11,5 +12,6 @@ export class Cliente{
         this.nombre = data.nombre;
         this.email = data.email;
         this.descripcion = data.descripcion;
+        this.fechaAlta = data.fechaAlta;
     }
 }
