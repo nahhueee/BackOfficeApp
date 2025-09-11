@@ -1,21 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Button } from 'primeng/button';
-import { FloatLabel } from 'primeng/floatlabel';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Cliente } from '../../../models/Cliente';
-import { InputTextModule } from 'primeng/inputtext';
 import { ClientesService } from '../../../services/clientes.service';
 import { NotificacionesService } from '../../../services/notificaciones.service';
+import { FORMS_IMPORTS } from '../../../imports/forms.import';
 
 @Component({
   selector: 'app-addmod-clientes',
   standalone: true,
   imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    Button,
-    InputTextModule, 
-    FloatLabel,
+    ...FORMS_IMPORTS,
   ],
   templateUrl: './addmod-clientes.html',
   styleUrl: './addmod-clientes.scss'

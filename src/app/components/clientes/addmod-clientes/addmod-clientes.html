@@ -1,6 +1,6 @@
 <form autocomplete="off" class="formulario" [formGroup]="formulario" (keyup.enter)='Guardar()'>
     <p-floatlabel variant="in">
-        <input pInputText formControlName="DNI" />
+        <input type="text" pInputText formControlName="DNI" [pAutoFocus]="true" />
         <label>DNI</label>
 
         @if(campoInvalido('DNI')){

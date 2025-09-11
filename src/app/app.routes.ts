@@ -20,7 +20,7 @@ export const routes: Routes = [
     },
     {
         path: 'apps',
-        loadComponent: () => import('./components/aplicaciones/aplicaciones').then(m => m.Aplicaciones)
+        loadComponent: () => import('./components/aplicaciones/main-aplicaciones/main-aplicaciones').then(m => m.Aplicaciones)
     },
     {
         path: '**',

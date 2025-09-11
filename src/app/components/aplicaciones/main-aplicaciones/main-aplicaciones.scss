@@ -1,5 +1,9 @@
 .contenedor{
     padding: 30px 50px;
+    display: flex;
+    gap:30px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .tarjeta{

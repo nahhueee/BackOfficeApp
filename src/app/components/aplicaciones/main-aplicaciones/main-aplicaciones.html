@@ -1,0 +1,11 @@
+<div class="contenedor">
+    @for (item of apps; track $index) {
+        <p-card class="tarjeta">
+            <ng-template #header>
+                <img alt="Card" class="w-full" [src]="item.portada" />
+            </ng-template>
+            <ng-template #title> {{item.nombre}} </ng-template>
+            <ng-template #subtitle> {{item.version}} </ng-template>
+        </p-card>
+    }
+</div>
