@@ -40,6 +40,7 @@ body {
 :root {
   /* Paleta Zinc - Modo claro */
   --zinc-50: #fafafa;
+  --zinc-80: #f7f7f7;
   --zinc-100: #f4f4f5;
   --zinc-200: #e4e4e7;
   --zinc-300: #d4d4d8;
@@ -60,6 +61,7 @@ body {
   --surface-d: var(--zinc-300);   /* Bordes */
   --surface-e: var(--zinc-50);    /* Surface de cards */
   --surface-f: var(--zinc-100);   /* Overlays */
+  --surface-g: var(--zinc-80);   /* Especial */
   
   /* Colores de texto para modo claro */
   --text-color: var(--zinc-900);
@@ -77,6 +79,8 @@ html.dark-mode {
   --surface-d: var(--zinc-600);   /* Bordes oscuros */
   --surface-e: var(--zinc-800);   /* Surface de cards oscuro */
   --surface-f: var(--zinc-900);   /* Overlays oscuros */
+  --surface-g: var(--zinc-700);   /* Especial */
+
   
   /* Colores de texto para modo oscuro */
   --text-color: var(--zinc-100);
@@ -156,6 +160,13 @@ h6{
 .acciones{
   display: flex;
   gap: 8px;
+}
+
+p-floatlabel{
+    width: 100% !important;
+}
+input{
+    width: 100% !important;
 }
 
 mat-icon {
