@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FiltroGral } from '../models/FiltroGral';
+import { FiltroGral } from '../models/filtros/FiltroGral';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import { Cliente } from '../models/Cliente';
@@ -20,6 +20,10 @@ export class ClientesService {
   //#endregion
 
   //#region ABM
+  ActualizarEstadoTerminal(DNI:string, idApp:number, habilitado:boolean): Observable<any>{
+    return this.apiService.put('appscliente/actualizar-estado', {DNI, idApp, habilitado})
+  }
+
   Agregar(cli:Cliente): Observable<any>{
     return this.apiService.post('clientes/agregar', cli)
   }

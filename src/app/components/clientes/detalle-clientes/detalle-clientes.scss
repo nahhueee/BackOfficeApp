@@ -1,9 +1,9 @@
 .contenido{
     padding: 30px 50px;
     display: flex;
-    gap:30px;
+    gap:20px;
     justify-content: center;
-    align-items: center;
+    flex-wrap: wrap;
 
     .izq{
         flex: 1;
@@ -12,6 +12,9 @@
     .der{
         flex: 2;
         max-width: 650px;
+        background-color: var(--surface-e);
+        padding: 20px;
+        border-radius: 10px;;
     }
 }
 
@@ -23,7 +26,7 @@
     gap: 30px;
     border-radius: 10px;
     padding: 20px;
-    background-color: var(--surface-b);
+    background-color: var(--surface-e);
     margin-bottom: 20px;
 
     .datos{
@@ -48,14 +51,14 @@
 }
 
 .app{
-    background-color: var(--surface-b);
+    background-color: var(--surface-e);
     border-radius: 10px;
     padding: 20px;
-    margin-bottom: 20px;
-
+    
     .enLinea{
         display: flex;
         justify-content: space-between;
+        align-items: center;
         margin-bottom: 15px;
 
         h5{
@@ -67,11 +70,11 @@
             font-size: 20px;
             cursor: pointer;
         }
-        .habilitado{
-            color: #87ff6f;
+        .habilitado .p-button-text{
+            color: #87ff6f !important;
         }
-        .deshabilitado{
-            color: #ff6f6f;
+        .deshabilitado .p-button-outlined{
+            color: #ff6f6f !important;
         }
     }
 
@@ -84,4 +87,42 @@
         }
     }
 }
+
+//#region PAGOS
+.cabecera-tabla{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+::ng-deep .tabla{
+    .p-datatable-thead > tr > th{
+        background-color: var(--surface-g) !important;
+    }
+    .p-datatable-tbody > tr > td{
+        background-color: var(--surface-g) !important;
+    }
+    .p-paginator{
+        margin-top: 10px;
+        background-color: var(--surface-g) !important;
+    }
+}
+
+.formulario{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding-top: 5px;
+}
+
+.botones{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+//#endregion
 
