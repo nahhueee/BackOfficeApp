@@ -4,6 +4,7 @@ import { CardModule } from 'primeng/card';
 import { AplicacionesService } from '../../../services/aplicaciones.service';
 import { CommonModule } from '@angular/common';
 import { App } from '../../../models/App';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-aplicaciones',
@@ -20,6 +21,7 @@ export class Aplicaciones {
   apps:App[] = [];
 
   constructor(
+    private router:Router,
     private aplicacionesService:AplicacionesService
   ){}
 
@@ -31,5 +33,9 @@ export class Aplicaciones {
     this.aplicacionesService.ObtenerApps().subscribe(response => {
       this.apps = response;
     });
+  }
+
+  Navegar(idApp:number){
+    this.router.navigateByUrl(`apps/detalles/${idApp}`);
   }
 }

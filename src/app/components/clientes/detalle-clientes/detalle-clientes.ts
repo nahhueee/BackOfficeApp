@@ -67,7 +67,7 @@ export class DetalleClientes {
     return !!(control && control.invalid && control.dirty);
   }
 
- ngAfterViewInit(){
+  ngAfterViewInit(){
     setTimeout(() => {
       this.decimal_mask = {
         mask: Number,
@@ -185,12 +185,6 @@ export class DetalleClientes {
         });
       }
     });
-  }
-
-  FocusMonto() {
-    setTimeout(() => {
-      this.montoInput?.nativeElement.focus();
-    }, 0);
   }
 
   GuardarPago(){

@@ -5,7 +5,7 @@ import { Cliente } from '../../../models/Cliente';
 import { MatIconModule } from '@angular/material/icon';
 import { Button } from 'primeng/button';
 import { ClientesService } from '../../../services/clientes.service';
-import { FiltroGral } from '../../../models/filtros/FiltroGral';
+import { FiltroGral } from '../../../models/Filtros';
 import { DatePipe } from '@angular/common';
 import { Dialog } from 'primeng/dialog';
 import { AddmodClientes } from "../addmod-clientes/addmod-clientes";

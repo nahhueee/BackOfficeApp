@@ -7,6 +7,7 @@ import { YellowPreset } from './themes/yellow';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { HttpErrorHandlerService } from './services/http-error-handler.service';
+import { InterceptorService } from './services/interceptor.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
 
     // Interceptor de errores
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorHandlerService, multi: true },
+    { provide:HTTP_INTERCEPTORS, useClass: InterceptorService, multi:true},
 
     // Animaciones y PrimeNG
     provideAnimationsAsync(),

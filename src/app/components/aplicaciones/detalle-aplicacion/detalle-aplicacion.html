@@ -1,0 +1,97 @@
+<p-confirmpopup />
+
+<div class="contenido">
+    <div class="izq">
+        <div class="tarjeta">
+            <i class="pi pi-user"></i>
+
+            <div class="datos">
+                <h5>{{app.nombre}}</h5>
+                <p>{{app.version}}</p>
+            </div>
+                
+            <p-button 
+            label="Editar Datos"  
+            size="small" 
+            icon="pi pi-pencil" 
+            severity="primary"
+            (onClick)="mostrarmodalAddMod = true"/>
+        </div>
+
+    </div>
+    <div class="der">
+        <div class="cabecera-tabla">
+            <h4>Actualizaciones</h4>
+            <p-button 
+            label="Nuevo Pago"  
+            size="small" 
+            icon="pi pi-plus" 
+            severity="primary"
+            (onClick)="AgregarActualizacion()"/>
+        </div>
+        <p-divider />
+
+        <p-table 
+        class="tabla"
+        [value]="actualizaciones"
+        [lazy]="true"
+        [paginator]="true"
+        [totalRecords]="totalRecords"
+        (onLazyLoad)="BuscarActualizaciones($event)"
+        [loading]="loading"
+        [rows]="5"
+        [tableStyle]="{ 'width': '100%' }" 
+        tableStyleClass="auto-table">
+        
+            <ng-template #header>
+                <tr>
+                    <th>Fecha</th>
+                    <th>version</th>
+                    <th>resumen</th>
+                    <th>estado</th>
+                    <th>Borrar</th>
+                </tr>
+            </ng-template>
+            <ng-template #body let-act>
+                <tr>
+                    <td>{{ act.fecha | date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ act.version }}</td>
+                    <td>{{ act.resumen }}</td>
+                    <td>{{ act.estado }}</td>
+                    <td class="acciones">
+                        <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash" (click)="EliminarActualizacion($event, act.id)" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Modal Agregar Actualizacion -->
+<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '25rem' }">
+    <ng-template #header>
+        <div class="modal-header">
+            <i class="pi pi-cloud-download"></i>
+            <span>Nueva Actualizacion</span>
+        </div>
+    </ng-template>
+    <form autocomplete="off" class="formulario" [formGroup]="formActualizacion" (keyup.enter)='GuardarActualizacion()'>
+        <p-floatlabel variant="in">
+            <input #montoInput pInputText formControlName="monto" [imask]="decimal_mask"  />
+            <label>Monto</label>
+            @if(campoInvalido('monto')){
+                <small class="error">Monto es requerido.</small>
+            }
+        </p-floatlabel>
+
+        <p-floatlabel variant="in">
+            <input pInputText formControlName="obs"/>
+            <label>Observación</label>
+        </p-floatlabel>
+    </form>
+    <div class="botones">
+        <p-button label="Cancelar" severity="secondary" (click)="mostrarmodalAddMod = false" />
+        <p-button label="Guardar" (click)="GuardarActualizacion()" />
+    </div>
+</p-dialog>
+

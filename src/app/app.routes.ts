@@ -23,6 +23,10 @@ export const routes: Routes = [
         loadComponent: () => import('./components/aplicaciones/main-aplicaciones/main-aplicaciones').then(m => m.Aplicaciones)
     },
     {
+        path: 'apps/detalles/:idApp',
+        loadComponent: () => import('./components/aplicaciones/detalle-aplicacion/detalle-aplicacion').then(m => m.DetalleAplicacion)
+    },
+    {
         path: '**',
         redirectTo: 'inicio',
         pathMatch: 'full'

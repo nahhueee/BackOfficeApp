@@ -1,0 +1,128 @@
+.contenido{
+    padding: 30px 50px;
+    display: flex;
+    gap:20px;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .izq{
+        flex: 1;
+        max-width: 400px;
+    }
+    .der{
+        flex: 2;
+        max-width: 650px;
+        background-color: var(--surface-e);
+        padding: 20px;
+        border-radius: 10px;;
+    }
+}
+
+.tarjeta{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: var(--surface-e);
+    margin-bottom: 20px;
+
+    .datos{
+        text-align: center;
+        text-align: center;
+        
+        h5{
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        p{
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    }
+
+    i{
+        font-size: 50px;
+        color: var(--p-primary-color);
+    }
+}
+
+.app{
+    background-color: var(--surface-e);
+    border-radius: 10px;
+    padding: 20px;
+    
+    .enLinea{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        h5{
+            font-size: 20px;
+            font-family: "Poppins";
+            font-weight: 100;
+        }
+        i{
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .habilitado .p-button-text{
+            color: #87ff6f !important;
+        }
+        .deshabilitado .p-button-outlined{
+            color: #ff6f6f !important;
+        }
+    }
+
+    p{
+        margin-bottom: 3px;
+        font-size: 15px;
+
+        span{
+            color: var(--p-primary-color);
+        }
+    }
+}
+
+//#region PAGOS
+.cabecera-tabla{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+::ng-deep .tabla{
+    .p-datatable-thead > tr > th{
+        background-color: var(--surface-g) !important;
+    }
+    .p-datatable-tbody > tr > td{
+        background-color: var(--surface-g) !important;
+    }
+    .p-paginator{
+        margin-top: 10px;
+        background-color: var(--surface-g) !important;
+    }
+}
+
+.formulario{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding-top: 5px;
+}
+
+.botones{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+//#endregion
+

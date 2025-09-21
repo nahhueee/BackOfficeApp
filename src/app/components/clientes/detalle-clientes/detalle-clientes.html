@@ -93,7 +93,7 @@
 </div>
 
 <!-- Modal Agregar Pagos -->
-<p-dialog [modal]="true" [(visible)]="mostrarModalPago" [style]="{ width: '25rem' }" (onShow)="FocusMonto()">
+<p-dialog [modal]="true" [(visible)]="mostrarModalPago" [style]="{ width: '25rem' }">
     <ng-template #header>
         <div class="modal-header">
             <i class="pi pi-dollar"></i>
@@ -102,7 +102,7 @@
     </ng-template>
     <form autocomplete="off" class="formulario" [formGroup]="formPago" (keyup.enter)='GuardarPago()'>
         <p-floatlabel variant="in">
-            <input #montoInput pInputText formControlName="monto" [imask]="decimal_mask"  />
+            <input #montoInput pInputText formControlName="monto" [imask]="decimal_mask" [pAutoFocus]="true"  />
             <label>Monto</label>
             @if(campoInvalido('monto')){
                 <small class="error">Monto es requerido.</small>

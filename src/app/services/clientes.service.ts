@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FiltroGral } from '../models/filtros/FiltroGral';
+import { FiltroGral } from '../models/Filtros';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import { Cliente } from '../models/Cliente';
