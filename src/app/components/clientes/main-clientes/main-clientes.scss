@@ -10,3 +10,48 @@
     margin-top: 10px;
 }
 
+
+.popover {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    ul{
+        padding: 0% !important;
+    }
+
+    .app-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--surface-e);
+        border: 1px solid var(--surface-d);
+        border-radius: 10px;
+        padding: 0.5rem 0.75rem;
+        transition: box-shadow 0.2s ease;
+        cursor: default;
+
+        &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+
+            span {
+                font-weight: 500;
+                font-size: 18px;
+                font-family: 'Poppins';
+            }
+
+            p {
+                font-size: 0.8rem;
+                margin: 0%;
+                color: var(--text-color-secondary);
+            }
+        }
+    }
+}

@@ -3,19 +3,12 @@
 <div class="contenido">
     <div class="izq">
         <div class="tarjeta">
-            <i class="pi pi-user"></i>
+            <img class="icono" [src]="app.portada" />
 
             <div class="datos">
                 <h5>{{app.nombre}}</h5>
                 <p>{{app.version}}</p>
             </div>
-                
-            <p-button 
-            label="Editar Datos"  
-            size="small" 
-            icon="pi pi-pencil" 
-            severity="primary"
-            (onClick)="mostrarmodalAddMod = true"/>
         </div>
 
     </div>
@@ -23,7 +16,7 @@
         <div class="cabecera-tabla">
             <h4>Actualizaciones</h4>
             <p-button 
-            label="Nuevo Pago"  
+            label="Nueva Actualizacion"  
             size="small" 
             icon="pi pi-plus" 
             severity="primary"
@@ -46,10 +39,10 @@
             <ng-template #header>
                 <tr>
                     <th>Fecha</th>
-                    <th>version</th>
-                    <th>resumen</th>
-                    <th>estado</th>
-                    <th>Borrar</th>
+                    <th>Versión</th>
+                    <th>Resumen</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
             </ng-template>
             <ng-template #body let-act>
@@ -58,8 +51,11 @@
                     <td>{{ act.version }}</td>
                     <td>{{ act.resumen }}</td>
                     <td>{{ act.estado }}</td>
-                    <td class="acciones">
-                        <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash" (click)="EliminarActualizacion($event, act.id)" />
+                    <td>
+                        <div class="acciones">
+                            <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" (click)="EditarActualizacion(act.id)" />
+                            <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash" (click)="EliminarActualizacion($event, act.id)" />
+                        </div>
                     </td>
                 </tr>
             </ng-template>
@@ -68,26 +64,56 @@
 </div>
 
 <!-- Modal Agregar Actualizacion -->
-<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '25rem' }">
+<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '50rem' }">
     <ng-template #header>
         <div class="modal-header">
             <i class="pi pi-cloud-download"></i>
             <span>Nueva Actualizacion</span>
         </div>
     </ng-template>
-    <form autocomplete="off" class="formulario" [formGroup]="formActualizacion" (keyup.enter)='GuardarActualizacion()'>
-        <p-floatlabel variant="in">
-            <input #montoInput pInputText formControlName="monto" [imask]="decimal_mask"  />
-            <label>Monto</label>
-            @if(campoInvalido('monto')){
-                <small class="error">Monto es requerido.</small>
-            }
-        </p-floatlabel>
+    <form autocomplete="off" class="formulario" [formGroup]="formActualizacion">
+        <div class="izq">
+            <p-selectbutton [options]="opcionesEstado" formControlName="estado" optionLabel="label" optionValue="value" aria-labelledby="basic" />
+            <p-divider />
 
-        <p-floatlabel variant="in">
-            <input pInputText formControlName="obs"/>
-            <label>Observación</label>
-        </p-floatlabel>
+            <p-floatlabel variant="in">
+                <input #resumenInput pInputText formControlName="resumen" (keyup.enter)='GuardarActualizacion()'/>
+                <label>Resumen</label>
+                @if(campoInvalido('resumen')){
+                    <small class="error">Resumen es requerido.</small>
+                }
+            </p-floatlabel>
+
+            <p-floatlabel variant="in">
+                <input #linkInput pInputText formControlName="link" (keyup.enter)='GuardarActualizacion()'/>
+                <label>Link</label>
+                @if(campoInvalido('link')){
+                    <small class="error">Link es requerido.</small>
+                }
+            </p-floatlabel>
+            <p-floatlabel variant="in">
+                <input #versionInput pInputText formControlName="version" (keyup.enter)='GuardarActualizacion()'/>
+                <label>Version</label>
+                @if(campoInvalido('version')){
+                    <small class="error">Version es requerido.</small>
+                }
+            </p-floatlabel>
+            <div class="switch">
+                <p-toggleswitch formControlName="front"/>
+                <span>Actualiza Frontend</span>
+            </div>
+            
+        </div>
+        <div class="der">
+            <p-floatlabel variant="in">
+                <textarea pTextarea id="over_label" rows="6" cols="30" class="h-full" formControlName="mejoras"></textarea>
+                <label>Mejoras</label>
+            </p-floatlabel>
+            <p-floatlabel variant="in">
+                <textarea pTextarea id="over_label" rows="6" cols="30" class="h-full" formControlName="correcciones"></textarea>
+                <label>Correcciones</label>
+            </p-floatlabel>
+        </div>
     </form>
     <div class="botones">
         <p-button label="Cancelar" severity="secondary" (click)="mostrarmodalAddMod = false" />

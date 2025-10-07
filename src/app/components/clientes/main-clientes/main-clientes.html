@@ -34,6 +34,7 @@
                     <td>{{ cliente.descripcion }}</td>
                     <td>{{ cliente.fechaAlta | date: 'dd/MM/yyyy' }}</td>
                     <td class="acciones">
+                        <p-button severity="primary" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-desktop" (click)="VerAppsCliente(cliente.DNI); op.toggle($event)" pTooltip="Apps" tooltipPosition="bottom" />
                         <p-button severity="primary" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-id-card" (onClick)="Navegar(cliente.DNI)" pTooltip="Detalles" tooltipPosition="bottom" />
                         <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" (onClick)="Editar(cliente.DNI)" pTooltip="Editar" tooltipPosition="bottom"/>
                     </td>
@@ -55,3 +56,30 @@
     </ng-template>
     <app-addmod-clientes [cliente]="clienteSeleccionado" (cerrar)="Actualizar($event)"/>
 </p-dialog>
+
+<!-- Popover aplicaciones -->
+<p-popover #op>
+    <div class="popover">
+        <div>
+            <ul>
+                @for(aplicacion of clienteSeleccionado?.apps; track $index) {
+                <li class="app-card">
+                    <div class="app-info">
+                        <span>{{ aplicacion.app?.nombre }}</span>
+                        <p>{{ aplicacion.actualizacion | date: 'dd/MM/yy HH:mm'}}</p>
+                    </div>
+                    <p-button 
+                        [icon]="aplicacion.habilitado ? 'pi pi-check-circle' : 'pi pi-times-circle'" 
+                        [rounded]="true" 
+                        [text]="true"
+                        [raised]="true"
+                        [severity]="aplicacion.habilitado ? 'success' : 'danger'"
+                        [pTooltip]="aplicacion.habilitado ? 'Habilitado' : 'Deshabilitado'" 
+                        tooltipPosition="bottom">
+                    </p-button>
+                </li>
+                }
+            </ul>
+        </div>
+    </div>
+</p-popover>

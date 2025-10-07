@@ -97,14 +97,17 @@
 
 ::ng-deep .tabla{
     .p-datatable-thead > tr > th{
-        background-color: var(--surface-g) !important;
+        background-color: var(--surface-e) !important;
+        border-color: var(--surface-g) !important;
     }
     .p-datatable-tbody > tr > td{
-        background-color: var(--surface-g) !important;
+        background-color: var(--surface-e) !important;
+        border-color: var(--surface-g) !important;
     }
     .p-paginator{
         margin-top: 10px;
-        background-color: var(--surface-g) !important;
+        background-color: var(--surface-e) !important;
+        border-color: var(--surface-g) !important;
     }
 }
 

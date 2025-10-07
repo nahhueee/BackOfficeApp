@@ -14,6 +14,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NotificacionesService } from '../../../services/notificaciones.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmPopup } from 'primeng/confirmpopup';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @Component({
   selector: 'app-detalle-aplicacion',
@@ -24,26 +26,33 @@ import { ConfirmPopup } from 'primeng/confirmpopup';
     Button,
     DividerModule,
     TableModule,
-    ConfirmPopup
+    ConfirmPopup,
+    ToggleSwitchModule,
+    SelectButtonModule
   ],
   providers: [ConfirmationService],
   templateUrl: './detalle-aplicacion.html',
   styleUrl: './detalle-aplicacion.scss'
 })
 export class DetalleAplicacion {
-  app:App
+  app:App = new App();
   idApp:number = 0;
   mostrarmodalAddMod: boolean = false;
   decimal_mask:any;
 
   filtroActual:FiltroActualizacion = new FiltroActualizacion();
-  pagos:Actualizacion[] = [];
-
   actualizaciones:Actualizacion[] = [];
   totalRecords:number = 0;
   loading:boolean = false;
 
+  modificandoActualizacion:boolean = false;
+  actualizacionSeleccionada: Actualizacion = new Actualizacion();
+
   formActualizacion:FormGroup;
+  opcionesEstado = [
+    {label: 'Test', value: 'test'},
+    {label: 'Prod', value: 'production'}
+  ]
 
   constructor(
     private rutaActiva: ActivatedRoute,
@@ -56,8 +65,9 @@ export class DetalleAplicacion {
       resumen: new FormControl('', [Validators.required]),
       mejoras: new FormControl(''),
       correcciones: new FormControl(''),
-      avances: new FormControl(''),
       version: new FormControl('', [Validators.required]),
+      link: new FormControl('', [Validators.required]),
+      front: new FormControl(true),
       estado: new FormControl('', [Validators.required]),
     });
   }
@@ -84,13 +94,13 @@ export class DetalleAplicacion {
       this.idApp = this.rutaActiva.snapshot.params['idApp'];
       if(this.idApp != 0){
         this.ObtenerApp();
+        this.BuscarActualizaciones();
       }
     });
   }
 
   ObtenerApp(){
     this.aplicacionesService.ObtenerApp(this.idApp).subscribe(response => {
-      console.log(response)
       this.app = response;
     });
   }
@@ -110,13 +120,35 @@ export class DetalleAplicacion {
     });
 
     this.actualizacionesService.ObtenerActalizaciones(this.filtroActual).subscribe(response => {
-      this.pagos = response.registros;
+      this.actualizaciones = response.registros;
       this.totalRecords = response.total;
       this.loading = false;
     });
   }
 
   AgregarActualizacion(){
+    this.modificandoActualizacion = false;
+    this.formActualizacion.reset();
+    this.actualizacionSeleccionada = new Actualizacion();
+    this.formActualizacion.get('estado')?.setValue('test');
+    this.mostrarmodalAddMod = true;
+  }
+
+  EditarActualizacion(idActualizacion:number){
+    this.modificandoActualizacion = true;
+    this.actualizacionSeleccionada = this.actualizaciones.find(a => a.id == idActualizacion)!;
+
+    this.formActualizacion.reset();
+    this.formActualizacion.patchValue({
+      resumen: this.actualizacionSeleccionada.resumen,
+      mejoras: this.actualizacionSeleccionada.mejoras,
+      correcciones: this.actualizacionSeleccionada.correcciones,
+      version: this.actualizacionSeleccionada.version,
+      link: this.actualizacionSeleccionada.link,
+      front: this.actualizacionSeleccionada.front,
+      estado: this.actualizacionSeleccionada.estado
+    });
+
     this.mostrarmodalAddMod = true;
   }
 
@@ -154,22 +186,39 @@ export class DetalleAplicacion {
     if(this.formActualizacion.invalid) return;
     
     let nuevaActualizacion = new Actualizacion();
+    nuevaActualizacion.id = this.actualizacionSeleccionada.id;
+    nuevaActualizacion.idApp = this.idApp;
     nuevaActualizacion.resumen = this.formActualizacion.value.resumen;
     nuevaActualizacion.mejoras = this.formActualizacion.value.mejoras;
     nuevaActualizacion.correcciones = this.formActualizacion.value.correcciones;
-    nuevaActualizacion.avances = this.formActualizacion.value.avances;
     nuevaActualizacion.version = this.formActualizacion.value.version;
     nuevaActualizacion.estado = this.formActualizacion.value.estado;
+    nuevaActualizacion.link = this.formActualizacion.value.link;
+    nuevaActualizacion.front = this.formActualizacion.value.front;
+    nuevaActualizacion.fecha = new Date();
 
-    this.actualizacionesService.Agregar(nuevaActualizacion)
-    .subscribe(response => {
-      if(response == "OK"){
-        this.Notificaciones.Success("Actualización creada correctamente");
-        this.mostrarmodalAddMod = false;
-        this.BuscarActualizaciones();
-      }else{
-        this.Notificaciones.Warn(response);
-      }
-    });
+    if(this.modificandoActualizacion){
+      this.actualizacionesService.Modificar(nuevaActualizacion)
+      .subscribe(response => {
+        if(response == "OK"){
+          this.Notificaciones.Success("Actualización editada correctamente");
+          this.mostrarmodalAddMod = false;
+          this.BuscarActualizaciones();
+        }else{
+          this.Notificaciones.Warn(response);
+        }
+      });
+    }else{
+      this.actualizacionesService.Agregar(nuevaActualizacion)
+      .subscribe(response => {
+        if(response == "OK"){
+          this.Notificaciones.Success("Actualización creada correctamente");
+          this.mostrarmodalAddMod = false;
+          this.BuscarActualizaciones();
+        }else{
+          this.Notificaciones.Warn(response);
+        }
+      });
+    }
   }
 }

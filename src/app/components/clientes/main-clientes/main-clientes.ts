@@ -11,6 +11,7 @@ import { Dialog } from 'primeng/dialog';
 import { AddmodClientes } from "../addmod-clientes/addmod-clientes";
 import { TooltipModule } from "primeng/tooltip";
 import { Router } from '@angular/router';
+import { PopoverModule } from 'primeng/popover';
 
 @Component({
   selector: 'app-clientes',
@@ -23,7 +24,8 @@ import { Router } from '@angular/router';
     DatePipe,
     Dialog,
     AddmodClientes,
-    TooltipModule
+    TooltipModule,
+    PopoverModule
 ],
   templateUrl: './main-clientes.html',
   styleUrl: './main-clientes.scss'
@@ -80,8 +82,11 @@ export class Clientes {
     this.mostrarmodalAddMod = true;
   }
 
+  VerAppsCliente(DNI:string){
+    this.clienteSeleccionado = this.clientes.find(c => c.DNI == DNI);
+  }
+
   Navegar(DNI:string){
-    let data = this.clientes.find(c => c.DNI == DNI);
-    this.router.navigateByUrl(`clientes/detalles/${data?.id}`);
+    this.router.navigateByUrl(`clientes/detalles/${DNI}`);
   }
 }

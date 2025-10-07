@@ -9,6 +9,7 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabel } from 'primeng/floatlabel';
 import { AutoFocusModule } from 'primeng/autofocus';
+import { TextareaModule } from 'primeng/textarea';
 
 //Otros
 import { IMaskModule } from 'angular-imask';
@@ -30,5 +31,6 @@ export const FORMS_IMPORTS = [
   RadioButtonModule,
   ToggleButtonModule,
   ButtonModule,
-  AutoFocusModule
+  AutoFocusModule,
+  TextareaModule
 ];

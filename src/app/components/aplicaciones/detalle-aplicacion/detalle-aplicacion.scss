@@ -44,9 +44,11 @@
         }
     }
 
-    i{
-        font-size: 50px;
-        color: var(--p-primary-color);
+    .icono{
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+        object-fit: cover;
     }
 }
 
@@ -88,7 +90,7 @@
     }
 }
 
-//#region PAGOS
+//#region Actualizaciones
 .cabecera-tabla{
     display: flex;
     justify-content: space-between;
@@ -97,24 +99,49 @@
 
 ::ng-deep .tabla{
     .p-datatable-thead > tr > th{
-        background-color: var(--surface-g) !important;
+        background-color: var(--surface-e) !important;
+        border-color: var(--surface-g) !important;
     }
     .p-datatable-tbody > tr > td{
-        background-color: var(--surface-g) !important;
+        background-color: var(--surface-e) !important;
+        border-color: var(--surface-g) !important;
     }
     .p-paginator{
         margin-top: 10px;
-        background-color: var(--surface-g) !important;
+        background-color: var(--surface-e) !important;
+        border-color: var(--surface-g) !important;
     }
 }
 
 .formulario{
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
+    gap: 25px;
     width: 100%;
     padding-top: 5px;
+
+    .izq{
+        flex: 1.5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .der{
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+.p-divider-horizontal{
+    margin: 8px 0;
+}
+.switch{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
 }
 
 .botones{

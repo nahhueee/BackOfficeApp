@@ -83,8 +83,10 @@
                     <td>{{ pago.fecha | date: 'dd/MM/yyyy' }}</td>
                     <td>${{ pago.monto | decimalFormat }}</td>
                     <td>{{ pago.obs }}</td>
-                    <td class="acciones">
-                        <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash" (click)="EliminarPago($event, pago.id)" />
+                    <td>
+                        <div class="acciones">
+                            <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash" (click)="EliminarPago($event, pago.id)" />
+                        </div>
                     </td>
                 </tr>
             </ng-template>

@@ -36,7 +36,7 @@ import { AddmodClientes } from '../addmod-clientes/addmod-clientes';
 export class DetalleClientes {
   @ViewChild('montoInput') montoInput!: ElementRef<HTMLInputElement>;
 
-  idCliente:number = 0;
+  DNICliente:string = "";
   cliente:Cliente = new Cliente();
   pagos:PagoCliente[] = [];
   totalRecords: number = 0;
@@ -81,8 +81,8 @@ export class DetalleClientes {
       }
 
       //Obtenemos el id de la caja desde la url
-      this.idCliente = this.rutaActiva.snapshot.params['idCliente'];
-      if(this.idCliente != 0){
+      this.DNICliente = this.rutaActiva.snapshot.params['dni'];
+      if(this.DNICliente && this.DNICliente != ""){
         this.ObtenerCliente();
         this.BuscarPagos();
       }
@@ -97,14 +97,14 @@ export class DetalleClientes {
   }
 
   ObtenerCliente(){
-    this.clientesService.ObtenerCliente(this.idCliente)
+    this.clientesService.ObtenerCliente(this.DNICliente)
     .subscribe(response => {
       this.cliente = response;
     });
   }
 
   BuscarPagos(event?: TableLazyLoadEvent) {
-    if(this.idCliente == 0) return;
+    if(this.DNICliente == "") return;
 
     this.loading = true;
 
@@ -114,7 +114,7 @@ export class DetalleClientes {
     this.filtroActual = new FiltroPagosCli({
         pagina: pageIndex + 1,   // tu backend usa base 1
         tamanioPagina: pageSize,
-        idCliente: this.idCliente
+        DNICliente: this.DNICliente
     });
 
     this.pagosClienteService.ObtenerPagos(this.filtroActual).subscribe(response => {

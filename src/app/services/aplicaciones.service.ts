@@ -13,7 +13,7 @@ export class AplicacionesService {
     return this.apiService.get('apps/obtener')
   }
   ObtenerApp(id:number): Observable<any> {
-    return this.apiService.get(`apps/obtener-app/${id}`)
+    return this.apiService.get(`apps/obtener/${id}`)
   }
   //#endregion
 }

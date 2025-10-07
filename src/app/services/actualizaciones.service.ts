@@ -20,6 +20,10 @@ export class ActualizacionesService {
   Agregar(act:Actualizacion): Observable<any>{
     return this.apiService.post('actualizaciones/agregar', act)
   }
+
+  Modificar(act:Actualizacion): Observable<any>{
+    return this.apiService.put('actualizaciones/modificar', act)
+  }
   
   Eliminar(id:number): Observable<any>{
     return this.apiService.delete(`actualizaciones/eliminar/${id}`)

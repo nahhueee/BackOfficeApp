@@ -4,7 +4,7 @@ export class FiltroPagosCli{
   total: number = 0;
   orden: string = "";
   direccion: string = "";
-  idCliente?:number;
+  DNICliente?:number;
 
   constructor(data?: any) {
     if (data) {
@@ -13,7 +13,7 @@ export class FiltroPagosCli{
       this.total = data.total;
       this.orden = data.orden;
       this.direccion = data.direccion;
-      this.idCliente = data.idCliente;
+      this.DNICliente = data.DNICliente;
     }
   }
 }

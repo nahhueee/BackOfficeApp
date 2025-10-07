@@ -15,7 +15,7 @@ export const routes: Routes = [
         loadComponent: () => import('./components/clientes/main-clientes/main-clientes').then(m => m.Clientes)
     },
     {
-        path: 'clientes/detalles/:idCliente',
+        path: 'clientes/detalles/:dni',
         loadComponent: () => import('./components/clientes/detalle-clientes/detalle-clientes').then(m => m.DetalleClientes)
     },
     {

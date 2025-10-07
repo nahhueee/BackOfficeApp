@@ -14,8 +14,8 @@ export class ClientesService {
   ObtenerClientes(filtro:FiltroGral): Observable<any> {
     return this.apiService.post('clientes/obtener', filtro)
   }
-  ObtenerCliente(id:number): Observable<any> {
-    return this.apiService.get(`clientes/obtener-cliente/${id}`)
+  ObtenerCliente(dni:string): Observable<any> {
+    return this.apiService.get(`clientes/obtener/${dni}`)
   }
   //#endregion
 
