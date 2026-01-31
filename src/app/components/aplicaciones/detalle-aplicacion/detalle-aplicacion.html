@@ -36,18 +36,22 @@
         [tableStyle]="{ 'width': '100%' }" 
         tableStyleClass="auto-table">
         
-            <ng-template #header>
+            <ng-template pTemplate="header">
                 <tr>
-                    <th>Fecha</th>
+                    <th>Ambiente</th>
+                    <th>Destino</th>
                     <th>Versión</th>
                     <th>Resumen</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </ng-template>
-            <ng-template #body let-act>
+            <ng-template pTemplate="body" let-act>
                 <tr>
-                    <td>{{ act.fecha | date: 'dd/MM/yyyy' }}</td>
+                    <td>
+                        <p-tag [value]="act.ambiente" [severity]="GetSeverity(act.ambiente)" />
+                    </td>
+                    <td>{{ act.tipo }}</td>
                     <td>{{ act.version }}</td>
                     <td>{{ act.resumen }}</td>
                     <td>{{ act.estado }}</td>
@@ -64,20 +68,20 @@
 </div>
 
 <!-- Modal Agregar Actualizacion -->
-<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '50rem' }">
+<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '70rem' }">
     <ng-template #header>
         <div class="modal-header">
             <i class="pi pi-cloud-download"></i>
             <span>Nueva Actualizacion</span>
         </div>
     </ng-template>
-    <form autocomplete="off" class="formulario" [formGroup]="formActualizacion">
+    <form autocomplete="off" class="formulario" [formGroup]="formActualizacion" (keyup.esc)="mostrarmodalAddMod = false" (keyup.enter)='GuardarActualizacion()' >
         <div class="izq">
-            <p-selectbutton [options]="opcionesEstado" formControlName="estado" optionLabel="label" optionValue="value" aria-labelledby="basic" />
+            <p-selectbutton [options]="opcionesAmbiente" formControlName="ambiente" optionLabel="label" optionValue="value" aria-labelledby="basic" />
             <p-divider />
 
             <p-floatlabel variant="in">
-                <input #resumenInput pInputText formControlName="resumen" (keyup.enter)='GuardarActualizacion()'/>
+                <input #resumenInput pInputText formControlName="resumen"/>
                 <label>Resumen</label>
                 @if(campoInvalido('resumen')){
                     <small class="error">Resumen es requerido.</small>
@@ -85,24 +89,30 @@
             </p-floatlabel>
 
             <p-floatlabel variant="in">
-                <input #linkInput pInputText formControlName="link" (keyup.enter)='GuardarActualizacion()'/>
+                <input #linkInput pInputText formControlName="link"/>
                 <label>Link</label>
                 @if(campoInvalido('link')){
                     <small class="error">Link es requerido.</small>
                 }
             </p-floatlabel>
-            <p-floatlabel variant="in">
-                <input #versionInput pInputText formControlName="version" (keyup.enter)='GuardarActualizacion()'/>
-                <label>Version</label>
-                @if(campoInvalido('version')){
-                    <small class="error">Version es requerido.</small>
-                }
-            </p-floatlabel>
-            <div class="switch">
-                <p-toggleswitch formControlName="front"/>
-                <span>Actualiza Frontend</span>
+
+            <div class="horizontal">
+                <p-floatlabel variant="in">
+                    <input #versionInput pInputText formControlName="version"/>
+                    <label>Version</label>
+                    @if(campoInvalido('version')){
+                        <small class="error">Version es requerido.</small>
+                    }
+                </p-floatlabel>
+                <p-floatlabel variant="in">
+                    <p-select [options]="opcionesDestino" optionValue="value" optionLabel="label" formControlName="destino" />
+                    <label>Destino</label>
+                </p-floatlabel>
             </div>
-            
+            <p-floatlabel variant="in">
+                <p-select [options]="opcionesEstado" optionValue="value" optionLabel="label" formControlName="estado" [appendTo]="'body'" />
+                <label>Estado</label>
+            </p-floatlabel>
         </div>
         <div class="der">
             <p-floatlabel variant="in">

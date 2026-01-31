@@ -10,12 +10,14 @@ import { Dialog } from 'primeng/dialog';
 import { Actualizacion } from '../../../models/Actualizacion';
 import { FiltroActualizacion } from '../../../models/Filtros';
 import { ActualizacionesService } from '../../../services/actualizaciones.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NotificacionesService } from '../../../services/notificaciones.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmPopup } from 'primeng/confirmpopup';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { SelectModule } from 'primeng/select';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-detalle-aplicacion',
@@ -28,7 +30,9 @@ import { SelectButtonModule } from 'primeng/selectbutton';
     TableModule,
     ConfirmPopup,
     ToggleSwitchModule,
-    SelectButtonModule
+    SelectButtonModule,
+    SelectModule,
+    TagModule
   ],
   providers: [ConfirmationService],
   templateUrl: './detalle-aplicacion.html',
@@ -49,9 +53,18 @@ export class DetalleAplicacion {
   actualizacionSeleccionada: Actualizacion = new Actualizacion();
 
   formActualizacion:FormGroup;
-  opcionesEstado = [
+  opcionesAmbiente = [
     {label: 'Test', value: 'test'},
-    {label: 'Prod', value: 'production'}
+    {label: 'Prod', value: 'prod'}
+  ]
+  opcionesDestino = [
+    {label: 'Frontend', value: 'frontend'},
+    {label: 'Backend', value: 'backend'}
+  ]
+  opcionesEstado = [
+    {label: '✏️ Borrador', value: 'borrador'},
+    {label: '🚀 Publicada', value: 'publicada'},
+    {label: '❌ Deshabilitada', value: 'deshabilitada'}
   ]
 
   constructor(
@@ -67,8 +80,9 @@ export class DetalleAplicacion {
       correcciones: new FormControl(''),
       version: new FormControl('', [Validators.required]),
       link: new FormControl('', [Validators.required]),
-      front: new FormControl(true),
+      ambiente: new FormControl('', [Validators.required]),
       estado: new FormControl('', [Validators.required]),
+      destino: new FormControl('', [Validators.required]),
     });
   }
 
@@ -130,7 +144,10 @@ export class DetalleAplicacion {
     this.modificandoActualizacion = false;
     this.formActualizacion.reset();
     this.actualizacionSeleccionada = new Actualizacion();
-    this.formActualizacion.get('estado')?.setValue('test');
+    this.formActualizacion.get('ambiente')?.setValue('test');
+    this.formActualizacion.get('destino')?.setValue('frontend');
+    this.formActualizacion.get('estado')?.setValue('borrador');
+
     this.mostrarmodalAddMod = true;
   }
 
@@ -145,8 +162,9 @@ export class DetalleAplicacion {
       correcciones: this.actualizacionSeleccionada.correcciones,
       version: this.actualizacionSeleccionada.version,
       link: this.actualizacionSeleccionada.link,
-      front: this.actualizacionSeleccionada.front,
-      estado: this.actualizacionSeleccionada.estado
+      destino: this.actualizacionSeleccionada.tipo,
+      estado: this.actualizacionSeleccionada.estado,
+      ambiente: this.actualizacionSeleccionada.ambiente,
     });
 
     this.mostrarmodalAddMod = true;
@@ -183,6 +201,7 @@ export class DetalleAplicacion {
   }
 
   GuardarActualizacion(){
+    this.markFormTouched(this.formActualizacion);
     if(this.formActualizacion.invalid) return;
     
     let nuevaActualizacion = new Actualizacion();
@@ -194,8 +213,9 @@ export class DetalleAplicacion {
     nuevaActualizacion.version = this.formActualizacion.value.version;
     nuevaActualizacion.estado = this.formActualizacion.value.estado;
     nuevaActualizacion.link = this.formActualizacion.value.link;
-    nuevaActualizacion.front = this.formActualizacion.value.front;
-    nuevaActualizacion.fecha = new Date();
+    nuevaActualizacion.ambiente = this.formActualizacion.value.ambiente;
+    nuevaActualizacion.tipo = this.formActualizacion.value.destino;
+    nuevaActualizacion.fechaPublicacion = new Date();
 
     if(this.modificandoActualizacion){
       this.actualizacionesService.Modificar(nuevaActualizacion)
@@ -220,5 +240,28 @@ export class DetalleAplicacion {
         }
       });
     }
+  }
+
+  markFormTouched(control: AbstractControl) {
+    if (control instanceof FormGroup || control instanceof FormArray) {
+      Object.values(control.controls).forEach(c => this.markFormTouched(c));
+    } else {
+      control.markAsTouched();
+      control.markAsDirty();
+    }
+  }
+
+   GetSeverity(ambiente: string): 'info' | 'warn' | 'success' {
+    const value = ambiente.toLowerCase();
+
+    if (value === 'prod') {
+      return 'warn';
+    }
+
+    if (value === 'test') {
+      return 'success';
+    }
+
+    return 'info';
   }
 }

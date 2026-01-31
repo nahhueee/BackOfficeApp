@@ -152,6 +152,32 @@ export class DetalleClientes {
     });
   }
 
+  ConfirmarEliminar(event: Event, terminal:string) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget, 
+      message: '¿Eliminar esta terminal?',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      rejectButtonProps: {
+          severity: 'secondary',
+          outlined: true
+      },
+      accept: () => {
+        this.clientesService.EliminarTerminal(terminal)
+        .subscribe(response => {
+          if(response == "OK"){
+
+            this.Notificaciones.Success("Terminal eliminada correctamente");
+            this.cliente.apps = this.cliente.apps.filter(a => a.terminal != terminal);
+          }else{
+            this.Notificaciones.Error("Ocurrió un error al intentar eliminar la terminal");
+          }
+        });
+      }
+    });
+  }
+
   AgregarPago(){
     this.formPago.reset();
     this.mostrarModalPago = true;

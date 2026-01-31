@@ -23,6 +23,9 @@ export class ClientesService {
   ActualizarEstadoTerminal(DNI:string, idApp:number, habilitado:boolean): Observable<any>{
     return this.apiService.put('appscliente/actualizar-estado', {DNI, idApp, habilitado})
   }
+  EliminarTerminal(terminal:string): Observable<any>{
+    return this.apiService.delete('appscliente/eliminar/' + terminal)
+  }
 
   Agregar(cli:Cliente): Observable<any>{
     return this.apiService.post('clientes/agregar', cli)

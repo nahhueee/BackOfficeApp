@@ -23,16 +23,29 @@
             <div class="app">
                 <div class="enLinea">
                     <h5>{{item.app?.nombre}}</h5>
-                    <p-button 
-                        [icon]="item.habilitado ? 'pi pi-check-circle' : 'pi pi-times-circle'" 
-                        [rounded]="true" 
-                        [text]="true"
-                        [raised]="true"
-                        [severity]="item.habilitado ? 'success' : 'danger'"
-                        [pTooltip]="item.habilitado ? 'Habilitado' : 'Deshabilitado'" 
-                        tooltipPosition="bottom"
-                        (click)="ConfirmarCambioEstado($event, item.app?.id!, item.habilitado!)">
-                    </p-button>
+                    <div class="acciones">
+                        <p-button 
+                            [icon]="item.habilitado ? 'pi pi-check-circle' : 'pi pi-times-circle'" 
+                            [rounded]="true" 
+                            [text]="true"
+                            [raised]="true"
+                            [severity]="item.habilitado ? 'success' : 'danger'"
+                            [pTooltip]="item.habilitado ? 'Habilitado' : 'Deshabilitado'" 
+                            tooltipPosition="bottom"
+                            (click)="ConfirmarCambioEstado($event, item.app?.id!, item.habilitado!)">
+                        </p-button>
+                        <p-button 
+                            icon="pi pi-trash" 
+                            [rounded]="true" 
+                            [text]="true"
+                            [raised]="true"
+                            severity="danger"
+                            pTooltip="Eliminar Terminal" 
+                            tooltipPosition="bottom"
+                            (click)="ConfirmarEliminar($event, item.terminal!)">
+                        </p-button>
+                    </div>
+                    
 
                 </div>
 

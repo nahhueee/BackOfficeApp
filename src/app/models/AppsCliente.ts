@@ -1,7 +1,7 @@
 import { App } from "./App";
 
 export class AppCliente {
-    terminal?:number;
+    terminal?:string;
     mac?:string;
     app?:App;
     version?:string;
