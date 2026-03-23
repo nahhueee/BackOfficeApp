@@ -152,7 +152,7 @@ export class DetalleClientes {
     });
   }
 
-  ConfirmarEliminar(event: Event, terminal:string) {
+  ConfirmarEliminar(event: Event, idTerminal:number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget, 
       message: '¿Eliminar esta terminal?',
@@ -164,12 +164,12 @@ export class DetalleClientes {
           outlined: true
       },
       accept: () => {
-        this.clientesService.EliminarTerminal(terminal)
+        this.clientesService.EliminarTerminal(idTerminal)
         .subscribe(response => {
           if(response == "OK"){
 
             this.Notificaciones.Success("Terminal eliminada correctamente");
-            this.cliente.apps = this.cliente.apps.filter(a => a.terminal != terminal);
+            this.cliente.apps = this.cliente.apps.filter(a => a.id != idTerminal);
           }else{
             this.Notificaciones.Error("Ocurrió un error al intentar eliminar la terminal");
           }
