@@ -15,5 +15,17 @@ export class AplicacionesService {
   ObtenerApp(id:number): Observable<any> {
     return this.apiService.get(`apps/obtener/${id}`)
   }
+  ObtenerFlota(idApp:number): Observable<any> {
+    return this.apiService.get(`appscliente/flota/${idApp}`)
+  }
+  //#endregion
+
+  //#region ROLLBACK
+  OrdenarRollback(terminal:string, idApp:number, versionOrigen:string): Observable<any> {
+    return this.apiService.post('appscliente/rollback', { terminal, idApp, versionOrigen })
+  }
+  CancelarRollback(terminal:string, idApp:number): Observable<any> {
+    return this.apiService.delete(`appscliente/rollback/${terminal}/${idApp}`)
+  }
   //#endregion
 }

@@ -161,3 +161,70 @@
 
 //#endregion
 
+
+//#region Versiones en tarjeta
+.versiones{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.version-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: var(--surface-d);
+    font-size: 13px;
+}
+
+.version-label{
+    color: var(--text-color-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    i { font-size: 12px; }
+}
+
+.version-valor{
+    font-weight: 600;
+    color: var(--p-primary-color);
+    font-size: 13px;
+}
+//#endregion
+
+//#region Flota
+.flota-header{
+    margin-top: 28px;
+}
+
+.terminal-id{
+    font-family: monospace;
+    font-size: 12px;
+    cursor: default;
+    color: var(--text-color-secondary);
+}
+
+.sin-dato{
+    color: var(--text-color-secondary);
+    font-size: 13px;
+}
+
+.sin-terminales{
+    text-align: center;
+    color: var(--text-color-secondary);
+    padding: 20px 0;
+    font-size: 14px;
+}
+//#endregion
+
+.der-form{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

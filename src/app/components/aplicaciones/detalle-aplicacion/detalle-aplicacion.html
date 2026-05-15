@@ -1,133 +1,263 @@
 <p-confirmpopup />
 
 <div class="contenido">
-    <div class="izq">
-        <div class="tarjeta">
-            <img class="icono" [src]="app.portada" />
 
-            <div class="datos">
-                <h5>{{app.nombre}}</h5>
-                <p>{{app.version}}</p>
+  <!-- ── Columna izquierda: info de la app ─────────────────────────── -->
+  <div class="izq">
+    <div class="tarjeta">
+      <img class="icono" [src]="app.portada" />
+      <div class="datos">
+        <h5>{{ app.nombre }}</h5>
+        <p>{{ app.clientes }} instalaciones</p>
+      </div>
+      <div class="versiones">
+        <div class="version-item">
+          <span class="version-label"><i class="pi pi-server"></i> Backend</span>
+          <span class="version-valor">{{ app.versionBackend ?? '—' }}</span>
+        </div>
+        <div class="version-item">
+          <span class="version-label"><i class="pi pi-desktop"></i> Frontend</span>
+          <span class="version-valor">{{ app.versionFrontend ?? '—' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Columna derecha: actualizaciones + flota ──────────────────── -->
+  <div class="der">
+
+    <!-- Actualizaciones -->
+    <div class="cabecera-tabla">
+      <h4>Actualizaciones</h4>
+      <p-button
+        label="Nueva"
+        size="small"
+        icon="pi pi-plus"
+        severity="primary"
+        (onClick)="AgregarActualizacion()" />
+    </div>
+    <p-divider />
+
+    <p-table
+      class="tabla"
+      [value]="actualizaciones"
+      [lazy]="true"
+      [paginator]="true"
+      [totalRecords]="totalRecords"
+      (onLazyLoad)="BuscarActualizaciones($event)"
+      [loading]="loading"
+      [rows]="5"
+      [tableStyle]="{ 'width': '100%' }"
+      tableStyleClass="auto-table">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Tipo</th>
+          <th>Versión</th>
+          <th>Resumen</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-act>
+        <tr>
+          <td>{{ act.tipo }}</td>
+          <td>{{ act.version }}</td>
+          <td>{{ act.resumen }}</td>
+          <td>
+            <p-tag [value]="act.estado" [severity]="GetEstadoSeverity(act.estado)" />
+          </td>
+          <td>
+            <div class="acciones">
+              <p-button severity="warn"   styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" (click)="EditarActualizacion(act.id)" />
+              <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash"  (click)="EliminarActualizacion($event, act.id)" />
             </div>
-        </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
 
+    <!-- Flota -->
+    <div class="cabecera-tabla flota-header">
+      <h4>Flota</h4>
+      <p-button
+        icon="pi pi-refresh"
+        [text]="true"
+        [rounded]="true"
+        size="small"
+        pTooltip="Actualizar"
+        tooltipPosition="left"
+        (onClick)="CargarFlota()" />
     </div>
-    <div class="der">
-        <div class="cabecera-tabla">
-            <h4>Actualizaciones</h4>
-            <p-button 
-            label="Nueva Actualizacion"  
-            size="small" 
-            icon="pi pi-plus" 
-            severity="primary"
-            (onClick)="AgregarActualizacion()"/>
-        </div>
-        <p-divider />
+    <p-divider />
 
-        <p-table 
-        class="tabla"
-        [value]="actualizaciones"
-        [lazy]="true"
-        [paginator]="true"
-        [totalRecords]="totalRecords"
-        (onLazyLoad)="BuscarActualizaciones($event)"
-        [loading]="loading"
-        [rows]="5"
-        [tableStyle]="{ 'width': '100%' }" 
-        tableStyleClass="auto-table">
-        
-            <ng-template pTemplate="header">
-                <tr>
-                    <th>Ambiente</th>
-                    <th>Destino</th>
-                    <th>Versión</th>
-                    <th>Resumen</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-act>
-                <tr>
-                    <td>
-                        <p-tag [value]="act.ambiente" [severity]="GetSeverity(act.ambiente)" />
-                    </td>
-                    <td>{{ act.tipo }}</td>
-                    <td>{{ act.version }}</td>
-                    <td>{{ act.resumen }}</td>
-                    <td>{{ act.estado }}</td>
-                    <td>
-                        <div class="acciones">
-                            <p-button severity="warn" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" (click)="EditarActualizacion(act.id)" />
-                            <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash" (click)="EliminarActualizacion($event, act.id)" />
-                        </div>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
-    </div>
+    <p-table
+      class="tabla"
+      [value]="flota"
+      [loading]="loadingFlota"
+      [tableStyle]="{ 'width': '100%' }"
+      tableStyleClass="auto-table">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Cliente</th>
+          <th>Terminal</th>
+          <th>Backend</th>
+          <th>DB</th>
+          <th>Activo</th>
+          <th>Errores</th>
+          <th>LAN</th>
+          <th>Heartbeat</th>
+          <th>Estado</th>
+          <th>Último update</th>
+          <th>Backups</th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-t>
+        <tr>
+          <td>{{ t.cliente }}</td>
+          <td>
+            <span [pTooltip]="t.terminal" tooltipPosition="top" class="terminal-id">
+              {{ GetTerminalCorta(t.terminal) }}
+            </span>
+          </td>
+          <td>{{ t.versionBack ?? '—' }}</td>
+          <td>
+            @if (t.dbStatus) {
+              <p-tag
+                [value]="t.dbStatus"
+                [severity]="t.dbStatus === 'ok' ? 'success' : 'danger'" />
+            } @else {
+              <span class="sin-dato">—</span>
+            }
+          </td>
+          <td>{{ FormatearTiempoActivo(t.tiempoActivo) }}</td>
+          <td>
+            @if ((t.totalErrores ?? 0) > 0) {
+              <p-tag [value]="t.totalErrores" severity="danger" [pTooltip]="t.erroresRecientes + ' recientes'" tooltipPosition="top" />
+            } @else {
+              <span class="sin-dato">0</span>
+            }
+          </td>
+          <td>{{ t.terminalesLanActivas ?? '—' }}</td>
+          <td>
+            <p-tag
+              [value]="GetHeartbeatLabel(t.ultimoHeartbeat)"
+              [severity]="GetHeartbeatSeverity(t.ultimoHeartbeat)" />
+          </td>
+          <td>
+            <p-tag
+              [value]="t.habilitado ? 'Activa' : 'Bloqueada'"
+              [severity]="t.habilitado ? 'success' : 'danger'" />
+          </td>
+          <td>
+            @if (t.ultimoEvento) {
+              <p-tag
+                [value]="GetEventoLabel(t.ultimoEvento.tipo)"
+                [severity]="GetEventoSeverity(t.ultimoEvento.tipo)"
+                [pTooltip]="t.ultimoEvento.version ? 'v' + t.ultimoEvento.version : ''"
+                tooltipPosition="top" />
+            } @else {
+              <span class="sin-dato">—</span>
+            }
+          </td>
+          <td>
+            <p-tag
+              [value]="GetBackupLabel(t)"
+              [severity]="GetBackupSeverity(t)"
+              [pTooltip]="GetBackupTooltip(t)"
+              tooltipPosition="top" />
+          </td>
+          <td>
+            @if (t.versionBack && t.habilitado) {
+              <p-button
+                icon="pi pi-history"
+                severity="warn"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                pTooltip="Revertir al backup anterior"
+                tooltipPosition="left"
+                [loading]="rollbackEnProceso === t.terminal"
+                (onClick)="OrdenarRollback($event, t)" />
+            }
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="12" class="sin-terminales">Sin terminales registradas</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+  </div>
 </div>
 
-<!-- Modal Agregar Actualizacion -->
+<!-- ── Modal Nueva / Editar Actualización ─────────────────────────────── -->
 <p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '70rem' }">
-    <ng-template #header>
-        <div class="modal-header">
-            <i class="pi pi-cloud-download"></i>
-            <span>Nueva Actualizacion</span>
-        </div>
-    </ng-template>
-    <form autocomplete="off" class="formulario" [formGroup]="formActualizacion" (keyup.esc)="mostrarmodalAddMod = false" (keyup.enter)='GuardarActualizacion()' >
-        <div class="izq">
-            <p-selectbutton [options]="opcionesAmbiente" formControlName="ambiente" optionLabel="label" optionValue="value" aria-labelledby="basic" />
-            <p-divider />
-
-            <p-floatlabel variant="in">
-                <input #resumenInput pInputText formControlName="resumen"/>
-                <label>Resumen</label>
-                @if(campoInvalido('resumen')){
-                    <small class="error">Resumen es requerido.</small>
-                }
-            </p-floatlabel>
-
-            <p-floatlabel variant="in">
-                <input #linkInput pInputText formControlName="link"/>
-                <label>Link</label>
-                @if(campoInvalido('link')){
-                    <small class="error">Link es requerido.</small>
-                }
-            </p-floatlabel>
-
-            <div class="horizontal">
-                <p-floatlabel variant="in">
-                    <input #versionInput pInputText formControlName="version"/>
-                    <label>Version</label>
-                    @if(campoInvalido('version')){
-                        <small class="error">Version es requerido.</small>
-                    }
-                </p-floatlabel>
-                <p-floatlabel variant="in">
-                    <p-select [options]="opcionesDestino" optionValue="value" optionLabel="label" formControlName="destino" />
-                    <label>Destino</label>
-                </p-floatlabel>
-            </div>
-            <p-floatlabel variant="in">
-                <p-select [options]="opcionesEstado" optionValue="value" optionLabel="label" formControlName="estado" [appendTo]="'body'" />
-                <label>Estado</label>
-            </p-floatlabel>
-        </div>
-        <div class="der">
-            <p-floatlabel variant="in">
-                <textarea pTextarea id="over_label" rows="6" cols="30" class="h-full" formControlName="mejoras"></textarea>
-                <label>Mejoras</label>
-            </p-floatlabel>
-            <p-floatlabel variant="in">
-                <textarea pTextarea id="over_label" rows="6" cols="30" class="h-full" formControlName="correcciones"></textarea>
-                <label>Correcciones</label>
-            </p-floatlabel>
-        </div>
-    </form>
-    <div class="botones">
-        <p-button label="Cancelar" severity="secondary" (click)="mostrarmodalAddMod = false" />
-        <p-button label="Guardar" (click)="GuardarActualizacion()" />
+  <ng-template #header>
+    <div class="modal-header">
+      <i class="pi pi-cloud-download"></i>
+      <span>{{ modificandoActualizacion ? 'Editar Actualización' : 'Nueva Actualización' }}</span>
     </div>
-</p-dialog>
+  </ng-template>
 
+  <form autocomplete="off" class="formulario" [formGroup]="formActualizacion"
+    (keyup.esc)="mostrarmodalAddMod = false"
+    (keyup.enter)="GuardarActualizacion()">
+
+    <div class="izq">
+      <p-selectbutton [options]="opcionesAmbiente" formControlName="ambiente" optionLabel="label" optionValue="value" />
+      <p-divider />
+
+      <p-floatlabel variant="in">
+        <input pInputText formControlName="resumen" />
+        <label>Resumen</label>
+        @if (campoInvalido('resumen')) { <small class="error">Requerido.</small> }
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <input pInputText formControlName="link" />
+        <label>Link</label>
+        @if (campoInvalido('link')) { <small class="error">Requerido.</small> }
+      </p-floatlabel>
+
+      <div class="horizontal">
+        <p-floatlabel variant="in">
+          <input pInputText formControlName="version" />
+          <label>Versión</label>
+          @if (campoInvalido('version')) { <small class="error">Requerido.</small> }
+        </p-floatlabel>
+        <p-floatlabel variant="in">
+          <p-select [options]="opcionesDestino" optionValue="value" optionLabel="label" formControlName="destino" />
+          <label>Tipo</label>
+        </p-floatlabel>
+      </div>
+
+      <p-floatlabel variant="in">
+        <p-select [options]="opcionesEstado" optionValue="value" optionLabel="label" formControlName="estado" [appendTo]="'body'" />
+        <label>Estado</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="der-form">
+      <p-floatlabel variant="in">
+        <textarea pTextarea rows="6" cols="30" class="h-full" formControlName="mejoras"></textarea>
+        <label>Mejoras</label>
+      </p-floatlabel>
+      <p-floatlabel variant="in">
+        <textarea pTextarea rows="6" cols="30" class="h-full" formControlName="correcciones"></textarea>
+        <label>Correcciones</label>
+      </p-floatlabel>
+    </div>
+  </form>
+
+  <div class="botones">
+    <p-button label="Cancelar" severity="secondary" (click)="mostrarmodalAddMod = false" />
+    <p-button label="Guardar"  (click)="GuardarActualizacion()" />
+  </div>
+</p-dialog>
