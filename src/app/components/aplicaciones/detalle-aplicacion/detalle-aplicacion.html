@@ -1,15 +1,13 @@
 <p-confirmpopup />
 
-<div class="contenido">
+<div class="pagina">
 
-  <!-- ── Columna izquierda: info de la app ─────────────────────────── -->
-  <div class="izq">
-    <div class="tarjeta">
-      <img class="icono" [src]="app.portada" />
-      <div class="datos">
-        <h5>{{ app.nombre }}</h5>
-        <p>{{ app.clientes }} instalaciones</p>
-      </div>
+  <!-- ── Cabecera de la app ─────────────────────────────────────────────── -->
+  <div class="app-cabecera">
+    <img class="app-icono" [src]="app.portada" />
+
+    <div class="app-meta">
+      <h3>{{ app.nombre }}</h3>
       <div class="versiones">
         <div class="version-item">
           <span class="version-label"><i class="pi pi-server"></i> Backend</span>
@@ -21,184 +19,517 @@
         </div>
       </div>
     </div>
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi">
+        <span class="kpi-valor">{{ kpiTotal }}</span>
+        <span class="kpi-label">Total</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-valor">{{ kpiActivas }}</span>
+        <span class="kpi-label">Activas</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-valor">{{ kpiAlDia }}</span>
+        <span class="kpi-label">Al día</span>
+      </div>
+      <div class="kpi" [class.kpi-alerta]="kpiAlertas > 0">
+        <span class="kpi-valor">{{ kpiAlertas }}</span>
+        <span class="kpi-label">Con alertas</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-valor">{{ kpiBackupsOk }}/{{ flota.length }}</span>
+        <span class="kpi-label">Backups OK</span>
+      </div>
+    </div>
   </div>
 
-  <!-- ── Columna derecha: actualizaciones + flota ──────────────────── -->
-  <div class="der">
+  <!-- ── Tabs: Releases / Flota / Errores ──────────────────────────────── -->
+  <p-tabs value="flota">
+    <p-tablist>
+      <p-tab value="releases"><i class="pi pi-cloud-download tab-icon"></i> Releases</p-tab>
+      <p-tab value="flota"><i class="pi pi-desktop tab-icon"></i> Flota</p-tab>
+      <p-tab value="errores"><i class="pi pi-exclamation-circle tab-icon"></i> Errores</p-tab>
+    </p-tablist>
 
-    <!-- Actualizaciones -->
-    <div class="cabecera-tabla">
-      <h4>Actualizaciones</h4>
-      <p-button
-        label="Nueva"
-        size="small"
-        icon="pi pi-plus"
-        severity="primary"
-        (onClick)="AgregarActualizacion()" />
-    </div>
-    <p-divider />
+    <p-tabpanels>
 
-    <p-table
-      class="tabla"
-      [value]="actualizaciones"
-      [lazy]="true"
-      [paginator]="true"
-      [totalRecords]="totalRecords"
-      (onLazyLoad)="BuscarActualizaciones($event)"
-      [loading]="loading"
-      [rows]="5"
-      [tableStyle]="{ 'width': '100%' }"
-      tableStyleClass="auto-table">
+      <!-- ── Tab Releases ───────────────────────────────────────────────── -->
+      <p-tabpanel value="releases">
+        <div class="tab-contenido">
+          <div class="cabecera-tabla">
+            <h4>Actualizaciones</h4>
+            <p-button
+              label="Nueva"
+              size="small"
+              icon="pi pi-plus"
+              severity="primary"
+              (onClick)="AgregarActualizacion()" />
+          </div>
+          <p-divider />
 
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Tipo</th>
-          <th>Versión</th>
-          <th>Resumen</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-act>
-        <tr>
-          <td>{{ act.tipo }}</td>
-          <td>{{ act.version }}</td>
-          <td>{{ act.resumen }}</td>
-          <td>
-            <p-tag [value]="act.estado" [severity]="GetEstadoSeverity(act.estado)" />
-          </td>
-          <td>
-            <div class="acciones">
-              <p-button severity="warn"   styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" (click)="EditarActualizacion(act.id)" />
-              <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash"  (click)="EliminarActualizacion($event, act.id)" />
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+          <p-table
+            class="tabla"
+            [value]="actualizaciones"
+            [lazy]="true"
+            [paginator]="true"
+            [totalRecords]="totalRecords"
+            (onLazyLoad)="BuscarActualizaciones($event)"
+            [loading]="loading"
+            [rows]="5"
+            [tableStyle]="{ 'width': '100%' }"
+            tableStyleClass="auto-table">
 
-    <!-- Flota -->
-    <div class="cabecera-tabla flota-header">
-      <h4>Flota</h4>
-      <p-button
-        icon="pi pi-refresh"
-        [text]="true"
-        [rounded]="true"
-        size="small"
-        pTooltip="Actualizar"
-        tooltipPosition="left"
-        (onClick)="CargarFlota()" />
-    </div>
-    <p-divider />
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Tipo</th>
+                <th>Versión</th>
+                <th>Resumen</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-act>
+              <tr>
+                <td>{{ act.tipo }}</td>
+                <td>{{ act.version }}</td>
+                <td>{{ act.resumen }}</td>
+                <td>
+                  <p-tag [value]="act.estado" [severity]="GetEstadoSeverity(act.estado)" />
+                </td>
+                <td>
+                  <div class="acciones">
+                    <p-button severity="warn"   styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-pencil" (click)="EditarActualizacion(act.id)" />
+                    <p-button severity="danger" styleClass="p-button-sm" [rounded]="true" [outlined]="true" icon="pi pi-trash"  (click)="EliminarActualizacion($event, act.id)" />
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabpanel>
 
-    <p-table
-      class="tabla"
-      [value]="flota"
-      [loading]="loadingFlota"
-      [tableStyle]="{ 'width': '100%' }"
-      tableStyleClass="auto-table">
+      <!-- ── Tab Flota ──────────────────────────────────────────────────── -->
+      <p-tabpanel value="flota">
+        <div class="tab-contenido">
 
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Cliente</th>
-          <th>Terminal</th>
-          <th>Backend</th>
-          <th>DB</th>
-          <th>Activo</th>
-          <th>Errores</th>
-          <th>LAN</th>
-          <th>Heartbeat</th>
-          <th>Estado</th>
-          <th>Último update</th>
-          <th>Backups</th>
-          <th></th>
-        </tr>
-      </ng-template>
+          <!-- Cabecera + Filtros -->
+          <div class="cabecera-tabla">
+            <h4>Flota</h4>
+            <p-button
+              icon="pi pi-refresh"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              pTooltip="Actualizar"
+              tooltipPosition="left"
+              (onClick)="CargarFlota()" />
+          </div>
 
-      <ng-template pTemplate="body" let-t>
-        <tr>
-          <td>{{ t.cliente }}</td>
-          <td>
-            <span [pTooltip]="t.terminal" tooltipPosition="top" class="terminal-id">
-              {{ GetTerminalCorta(t.terminal) }}
-            </span>
-          </td>
-          <td>{{ t.versionBack ?? '—' }}</td>
-          <td>
-            @if (t.dbStatus) {
-              <p-tag
-                [value]="t.dbStatus"
-                [severity]="t.dbStatus === 'ok' ? 'success' : 'danger'" />
-            } @else {
-              <span class="sin-dato">—</span>
-            }
-          </td>
-          <td>{{ FormatearTiempoActivo(t.tiempoActivo) }}</td>
-          <td>
-            @if ((t.totalErrores ?? 0) > 0) {
-              <p-tag [value]="t.totalErrores" severity="danger" [pTooltip]="t.erroresRecientes + ' recientes'" tooltipPosition="top" />
-            } @else {
-              <span class="sin-dato">0</span>
-            }
-          </td>
-          <td>{{ t.terminalesLanActivas ?? '—' }}</td>
-          <td>
-            <p-tag
-              [value]="GetHeartbeatLabel(t.ultimoHeartbeat)"
-              [severity]="GetHeartbeatSeverity(t.ultimoHeartbeat)" />
-          </td>
-          <td>
-            <p-tag
-              [value]="t.habilitado ? 'Activa' : 'Bloqueada'"
-              [severity]="t.habilitado ? 'success' : 'danger'" />
-          </td>
-          <td>
-            @if (t.ultimoEvento) {
-              <p-tag
-                [value]="GetEventoLabel(t.ultimoEvento.tipo)"
-                [severity]="GetEventoSeverity(t.ultimoEvento.tipo)"
-                [pTooltip]="t.ultimoEvento.version ? 'v' + t.ultimoEvento.version : ''"
-                tooltipPosition="top" />
-            } @else {
-              <span class="sin-dato">—</span>
-            }
-          </td>
-          <td>
-            <p-tag
-              [value]="GetBackupLabel(t)"
-              [severity]="GetBackupSeverity(t)"
-              [pTooltip]="GetBackupTooltip(t)"
-              tooltipPosition="top" />
-          </td>
-          <td>
-            @if (t.versionBack && t.habilitado) {
+          <div class="filtros-bar">
+            <input
+              pInputText
+              [(ngModel)]="filtroBusqueda"
+              (ngModelChange)="aplicarFiltros()"
+              placeholder="Buscar instalación..."
+              class="filtro-texto" />
+            <p-select
+              [options]="opcionesHeartbeatFlota"
+              [(ngModel)]="filtroHeartbeat"
+              (ngModelChange)="aplicarFiltros()"
+              optionLabel="label" optionValue="value" />
+            <p-select
+              [options]="opcionesBackupFlota"
+              [(ngModel)]="filtroBackup"
+              (ngModelChange)="aplicarFiltros()"
+              optionLabel="label" optionValue="value" />
+            <p-select
+              [options]="opcionesErroresFlota"
+              [(ngModel)]="filtroErrores"
+              (ngModelChange)="aplicarFiltros()"
+              optionLabel="label" optionValue="value" />
+            <p-select
+              [options]="opcionesVersionFlota"
+              [(ngModel)]="filtroVersion"
+              (ngModelChange)="aplicarFiltros()"
+              optionLabel="label" optionValue="value" />
+            <p-select
+              [options]="opcionesEstadoFlota"
+              [(ngModel)]="filtroEstado"
+              (ngModelChange)="aplicarFiltros()"
+              optionLabel="label" optionValue="value" />
+            @if (hayFiltrosActivos) {
               <p-button
-                icon="pi pi-history"
-                severity="warn"
+                icon="pi pi-filter-slash"
                 [text]="true"
                 [rounded]="true"
                 size="small"
-                pTooltip="Revertir al backup anterior"
+                severity="secondary"
+                pTooltip="Limpiar filtros"
                 tooltipPosition="left"
-                [loading]="rollbackEnProceso === t.terminal"
-                (onClick)="OrdenarRollback($event, t)" />
+                (onClick)="limpiarFiltros()" />
             }
-          </td>
-        </tr>
-      </ng-template>
+          </div>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="12" class="sin-terminales">Sin terminales registradas</td>
-        </tr>
-      </ng-template>
-    </p-table>
+          <p-divider />
 
-  </div>
+          <!-- Tabla de instalaciones agrupadas -->
+          <p-table
+            class="tabla"
+            [value]="instalacionesFiltradas"
+            [loading]="loadingFlota"
+            [tableStyle]="{ 'width': '100%' }"
+            tableStyleClass="auto-table">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3rem"></th>
+                <th>Instalación</th>
+                <th>Versión</th>
+                <th>Heartbeat</th>
+                <th>Estado</th>
+                <th>Errores</th>
+                <th>Backup</th>
+              </tr>
+            </ng-template>
+
+            <!-- Fila de instalación + expansión inline -->
+            <ng-template pTemplate="body" let-inst>
+
+              <!-- Fila resumen de la instalación -->
+              <tr class="fila-instalacion"
+                  [class.fila-alerta]="inst.heartbeatSeverity === 'danger' || (!['ok','pendiente'].includes(inst.backupEstado) && inst.backupEstado !== 'sin_backup')">
+                <td>
+                  <p-button
+                    [icon]="expandedRows[inst.DNI] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="toggleRow(inst)" />
+                </td>
+                <td>
+                  <div class="instalacion-nombre">{{ inst.nombre }}</div>
+                  <div class="instalacion-meta">
+                    DNI {{ inst.DNI }}
+                    @if (inst.terminales.length > 1) {
+                      · {{ inst.terminales.length }} terminales
+                    }
+                  </div>
+                </td>
+                <td>{{ inst.versionBack ?? '—' }}</td>
+                <td>
+                  <p-tag
+                    [value]="GetInstalacionHeartbeatLabel(inst.heartbeatSeverity)"
+                    [severity]="inst.heartbeatSeverity" />
+                </td>
+                <td>
+                  <p-tag
+                    [value]="inst.habilitado ? 'Activa' : 'Bloqueada'"
+                    [severity]="inst.habilitado ? 'success' : 'danger'" />
+                </td>
+                <td>
+                  @if (inst.totalErrores > 0) {
+                    <p-tag [value]="inst.totalErrores" severity="danger" />
+                  } @else {
+                    <span class="sin-dato">0</span>
+                  }
+                </td>
+                <td>
+                  <p-tag
+                    [value]="GetBackupLabelFromEstado(inst.backupEstado)"
+                    [severity]="GetBackupSeverityFromEstado(inst.backupEstado)" />
+                </td>
+              </tr>
+
+              <!-- Fila de terminales (expansión) -->
+              @if (expandedRows[inst.DNI]) {
+                <tr class="fila-expansion">
+                  <td colspan="7" class="expansion-celda">
+                    <table class="tabla-interna">
+                      <thead>
+                        <tr>
+                          <th>Terminal</th>
+                          <th>Backend</th>
+                          <th>Frontend</th>
+                          <th>DB</th>
+                          <th>Activo</th>
+                          <th>Errores</th>
+                          <th>LAN</th>
+                          <th>Heartbeat</th>
+                          <th>Estado</th>
+                          <th>Update back</th>
+                          <th>Update front</th>
+                          <th>Backups</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (t of inst.terminales; track t.terminal) {
+                          <tr>
+                            <td>
+                              <span [pTooltip]="t.terminal" tooltipPosition="top" class="terminal-id">
+                                {{ GetTerminalCorta(t.terminal) }}
+                              </span>
+                              @if (t.esCanary) {
+                                <p-tag value="canary" severity="warn" pTooltip="Terminal en canary tier (back y front)" tooltipPosition="top" />
+                              }
+                            </td>
+                            <td>{{ t.versionBack ?? '—' }}</td>
+                            <td>
+                              <span class="version-front-cell">
+                                {{ t.versionFront ?? '—' }}
+                                @if (t.confirmacionFrontPendiente) {
+                                  <p-tag value="instalando" severity="info" pTooltip="Update de front aplicándose / confirmando boot" tooltipPosition="top" />
+                                }
+                              </span>
+                            </td>
+                            <td>
+                              @if (t.dbStatus) {
+                                <p-tag [value]="t.dbStatus" [severity]="t.dbStatus === 'ok' ? 'success' : 'danger'" />
+                              } @else {
+                                <span class="sin-dato">—</span>
+                              }
+                            </td>
+                            <td>{{ FormatearTiempoActivo(t.tiempoActivo) }}</td>
+                            <td>
+                              @if ((t.totalErrores ?? 0) > 0) {
+                                <p-tag [value]="t.totalErrores" severity="danger" [pTooltip]="t.erroresRecientes + ' recientes'" tooltipPosition="top" />
+                              } @else {
+                                <span class="sin-dato">0</span>
+                              }
+                            </td>
+                            <td>{{ t.terminalesLanActivas ?? '—' }}</td>
+                            <td>
+                              <p-tag
+                                [value]="GetHeartbeatLabel(t.ultimoHeartbeat)"
+                                [severity]="GetHeartbeatSeverity(t.ultimoHeartbeat)" />
+                            </td>
+                            <td>
+                              <p-tag
+                                [value]="t.habilitado ? 'Activa' : 'Bloqueada'"
+                                [severity]="t.habilitado ? 'success' : 'danger'" />
+                            </td>
+                            <td>
+                              @if (t.ultimoEventoBack) {
+                                <p-tag
+                                  [value]="GetEventoLabel(t.ultimoEventoBack.tipo)"
+                                  [severity]="GetEventoSeverity(t.ultimoEventoBack.tipo)"
+                                  [pTooltip]="t.ultimoEventoBack.version ? 'v' + t.ultimoEventoBack.version : ''"
+                                  tooltipPosition="top" />
+                              } @else {
+                                <span class="sin-dato">—</span>
+                              }
+                            </td>
+                            <td>
+                              @if (t.ultimoEventoFront) {
+                                <p-tag
+                                  [value]="GetEventoFrontLabel(t.ultimoEventoFront.tipo)"
+                                  [severity]="GetEventoFrontSeverity(t.ultimoEventoFront.tipo)"
+                                  [pTooltip]="t.ultimoEventoFront.error ?? (t.ultimoEventoFront.version ? 'v' + t.ultimoEventoFront.version : '')"
+                                  tooltipPosition="top" />
+                              } @else {
+                                <span class="sin-dato">—</span>
+                              }
+                            </td>
+                            <td>
+                              <p-tag
+                                [value]="GetBackupLabel(t)"
+                                [severity]="GetBackupSeverity(t)"
+                                [pTooltip]="GetBackupTooltip(t)"
+                                tooltipPosition="top" />
+                            </td>
+                            <td>
+                              @if (t.versionBack && t.habilitado) {
+                                <p-button
+                                  icon="pi pi-history"
+                                  severity="warn"
+                                  [text]="true"
+                                  [rounded]="true"
+                                  size="small"
+                                  pTooltip="Revertir backend al backup anterior"
+                                  tooltipPosition="left"
+                                  [loading]="rollbackEnProceso === t.terminal"
+                                  (onClick)="OrdenarRollback($event, t)" />
+                              }
+                              @if (t.habilitado) {
+                                <p-button
+                                  icon="pi pi-desktop"
+                                  severity="warn"
+                                  [text]="true"
+                                  [rounded]="true"
+                                  size="small"
+                                  pTooltip="Rollback de frontend"
+                                  tooltipPosition="left"
+                                  [loading]="rollbackFrontEnProceso === t.terminal"
+                                  (onClick)="AbrirRollbackFront(t)" />
+                              }
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              }
+
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7" class="sin-terminales">
+                  @if (loadingFlota) { Cargando... }
+                  @else if (hayFiltrosActivos) { Sin instalaciones que coincidan con los filtros }
+                  @else { Sin terminales registradas }
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Tab Errores ───────────────────────────────────────────────── -->
+      <p-tabpanel value="errores">
+        <div class="tab-contenido">
+          <div class="cabecera-tabla">
+            <h4>Errores recurrentes</h4>
+            <p-button
+              icon="pi pi-refresh"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              pTooltip="Actualizar"
+              tooltipPosition="left"
+              (onClick)="CargarErrores()" />
+          </div>
+          <p-divider />
+
+          <p-table
+            class="tabla"
+            [value]="errores"
+            [loading]="loadingErrores"
+            [tableStyle]="{ 'width': '100%' }"
+            tableStyleClass="auto-table">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 100px">Severidad</th>
+                <th>Código</th>
+                <th style="width: 120px">Instalaciones</th>
+                <th style="width: 120px">Ocurrencias</th>
+                <th style="width: 130px">Primera vez</th>
+                <th style="width: 130px">Última vez</th>
+                <th style="width: 60px"></th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-e>
+              <tr [class.error-critico]="getSeveridadLabel(e.codigo) === 'CRITICA'"
+                  [class.error-alto]="getSeveridadLabel(e.codigo) === 'ALTA'">
+                <td>
+                  <p-tag
+                    [value]="getSeveridadLabel(e.codigo)"
+                    [severity]="getSeveridadTag(e.codigo)" />
+                </td>
+                <td class="codigo-error">{{ e.codigo }}</td>
+                <td>{{ e.instalacionesAfectadas }}</td>
+                <td>
+                  @if (e.cantidadTotal > 0) {
+                    <p-tag [value]="e.cantidadTotal" [severity]="getSeveridadTag(e.codigo)" />
+                  } @else {
+                    <span class="sin-dato">0</span>
+                  }
+                </td>
+                <td class="sin-dato">{{ FormatearFecha(e.primeraOcurrencia) }}</td>
+                <td class="sin-dato">{{ FormatearFecha(e.ultimaOcurrencia) }}</td>
+                <td>
+                  <p-button
+                    icon="pi pi-list"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    pTooltip="Ver instalaciones afectadas"
+                    tooltipPosition="left"
+                    (onClick)="VerDetalleError(e)" />
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7" class="sin-terminales">
+                  @if (loadingErrores) { Cargando... }
+                  @else { Sin errores registrados }
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabpanel>
+
+    </p-tabpanels>
+  </p-tabs>
+
 </div>
 
+<!-- ── Dialog drill-down de error ────────────────────────────────────────── -->
+<p-dialog
+  [modal]="true"
+  [(visible)]="mostrarDetalle"
+  [style]="{ width: '55rem' }"
+  [draggable]="false">
+  <ng-template #header>
+    <div class="modal-header">
+      <i class="pi pi-exclamation-circle"></i>
+      <span>{{ errorSeleccionado?.codigo }}</span>
+      @if (errorSeleccionado) {
+        <p-tag
+          [value]="getSeveridadLabel(errorSeleccionado.codigo)"
+          [severity]="getSeveridadTag(errorSeleccionado.codigo)"
+          styleClass="ml-2" />
+      }
+    </div>
+  </ng-template>
+
+  <p-table
+    class="tabla"
+    [value]="detalleErrores"
+    [loading]="loadingDetalle"
+    [tableStyle]="{ 'width': '100%' }"
+    tableStyleClass="auto-table">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Instalación</th>
+        <th>DNI</th>
+        <th>Ocurrencias</th>
+        <th>Primera vez</th>
+        <th>Última vez</th>
+        <th>Último mensaje</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-d>
+      <tr>
+        <td>{{ d.cliente }}</td>
+        <td class="sin-dato">{{ d.DNI }}</td>
+        <td><p-tag [value]="d.cantidad" severity="secondary" /></td>
+        <td class="sin-dato">{{ FormatearFecha(d.primeraOcurrencia) }}</td>
+        <td class="sin-dato">{{ FormatearFecha(d.ultimaOcurrencia) }}</td>
+        <td class="mensaje-error" [pTooltip]="d.mensaje" tooltipPosition="top">
+          {{ d.mensaje ? (d.mensaje.length > 60 ? d.mensaje.slice(0, 60) + '…' : d.mensaje) : '—' }}
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="sin-terminales">Sin instalaciones afectadas</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-dialog>
+
 <!-- ── Modal Nueva / Editar Actualización ─────────────────────────────── -->
-<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '70rem' }">
+<p-dialog [modal]="true" [(visible)]="mostrarmodalAddMod" [style]="{ width: '72rem' }" [draggable]="false">
   <ng-template #header>
     <div class="modal-header">
       <i class="pi pi-cloud-download"></i>
@@ -207,57 +538,168 @@
   </ng-template>
 
   <form autocomplete="off" class="formulario" [formGroup]="formActualizacion"
-    (keyup.esc)="mostrarmodalAddMod = false"
-    (keyup.enter)="GuardarActualizacion()">
+    (keyup.esc)="mostrarmodalAddMod = false">
 
-    <div class="izq">
-      <p-selectbutton [options]="opcionesAmbiente" formControlName="ambiente" optionLabel="label" optionValue="value" />
-      <p-divider />
+    <!-- ── Selector de tipo ── -->
+    <div class="tipo-selector">
 
-      <p-floatlabel variant="in">
-        <input pInputText formControlName="resumen" />
-        <label>Resumen</label>
-        @if (campoInvalido('resumen')) { <small class="error">Requerido.</small> }
-      </p-floatlabel>
+      <div class="tipo-card" [class.tipo-card--activo]="formActualizacion.get('destino')?.value === 'backend'"
+           (click)="setTipo('backend')">
+        <div class="tipo-card-icono tipo-icono-backend">
+          <i class="pi pi-server"></i>
+        </div>
+        <div class="tipo-card-info">
+          <span class="tipo-card-titulo">Backend</span>
+          <span class="tipo-card-desc">Servidor Node.js · lógica de negocio</span>
+        </div>
+        @if (formActualizacion.get('destino')?.value === 'backend') {
+          <div class="tipo-card-check"><i class="pi pi-check-circle"></i></div>
+        }
+      </div>
 
-      <p-floatlabel variant="in">
-        <input pInputText formControlName="link" />
-        <label>Link</label>
-        @if (campoInvalido('link')) { <small class="error">Requerido.</small> }
-      </p-floatlabel>
+      <div class="tipo-card" [class.tipo-card--activo]="formActualizacion.get('destino')?.value === 'frontend'"
+           (click)="setTipo('frontend')">
+        <div class="tipo-card-icono tipo-icono-frontend">
+          <i class="pi pi-desktop"></i>
+        </div>
+        <div class="tipo-card-info">
+          <span class="tipo-card-titulo">Frontend</span>
+          <span class="tipo-card-desc">Interfaz de usuario Tauri · Angular</span>
+        </div>
+        @if (formActualizacion.get('destino')?.value === 'frontend') {
+          <div class="tipo-card-check"><i class="pi pi-check-circle"></i></div>
+        }
+      </div>
 
-      <div class="horizontal">
+    </div>
+
+    <!-- ── Cuerpo del formulario ── -->
+    <div class="form-cuerpo">
+
+      <div class="col-izq">
+
         <p-floatlabel variant="in">
-          <input pInputText formControlName="version" />
-          <label>Versión</label>
-          @if (campoInvalido('version')) { <small class="error">Requerido.</small> }
+          <input pInputText formControlName="resumen" />
+          <label>Resumen</label>
+          @if (campoInvalido('resumen')) { <small class="error">Requerido.</small> }
+        </p-floatlabel>
+
+        <p-floatlabel variant="in">
+          <input pInputText formControlName="link" />
+          <label>Link de descarga</label>
+          @if (campoInvalido('link')) { <small class="error">Requerido.</small> }
+        </p-floatlabel>
+
+        <div class="horizontal">
+          <p-floatlabel variant="in">
+            <input pInputText formControlName="version" />
+            <label>Versión</label>
+            @if (campoInvalido('version')) { <small class="error">Requerido.</small> }
+          </p-floatlabel>
+          <p-floatlabel variant="in">
+            <p-select [options]="opcionesEstado" optionValue="value" optionLabel="label"
+                      formControlName="estado" [appendTo]="'body'" />
+            <label>Estado</label>
+          </p-floatlabel>
+        </div>
+
+        <!-- Panel condicional: Backend -->
+        @if (formActualizacion.get('destino')?.value === 'backend') {
+          <div class="panel-condicional panel-backend">
+            <div class="panel-titulo"><i class="pi pi-cog"></i> Opciones de deploy</div>
+
+            <div class="npm-toggle">
+              <p-toggleswitch formControlName="requiereNpmInstall" />
+              <div class="npm-toggle-label">
+                <span class="npm-toggle-titulo">Requiere <code>npm install</code></span>
+                <span class="npm-toggle-desc">El updater ejecutará npm install antes de reiniciar</span>
+              </div>
+            </div>
+
+            <p-floatlabel variant="in">
+              <input pInputText type="number" min="0" formControlName="tamanoBytes" />
+              <label>Tamaño del archivo (bytes)</label>
+            </p-floatlabel>
+            @if (tamanoEnMB) {
+              <small class="tamano-hint">{{ tamanoEnMB }}</small>
+            }
+          </div>
+        }
+
+        <!-- Panel condicional: Frontend -->
+        @if (formActualizacion.get('destino')?.value === 'frontend') {
+          <div class="panel-condicional panel-frontend">
+            <div class="panel-titulo"><i class="pi pi-link"></i> Versiones backend compatibles</div>
+
+            @if (loadingVersionesBackend) {
+              <small class="cargando-versiones"><i class="pi pi-spin pi-spinner"></i> Cargando versiones...</small>
+            } @else if (versionesBackendDisponibles.length === 0) {
+              <small class="sin-versiones">Sin versiones backend en producción o canary para este app.</small>
+            } @else {
+              <div class="versiones-chips">
+                @for (v of versionesBackendDisponibles; track v.version) {
+                  <div class="version-chip"
+                       [class.version-chip--seleccionado]="esVersionSeleccionada(v.version)"
+                       (click)="toggleVersionBackend(v.version)">
+                    <span class="version-chip-numero">v{{ v.version }}</span>
+                    <p-tag
+                      [value]="v.estado === 'produccion' ? 'PROD' : 'CANARY'"
+                      [severity]="v.estado === 'produccion' ? 'success' : 'warn'"
+                      styleClass="tag-mini" />
+                    @if (esVersionSeleccionada(v.version)) {
+                      <i class="pi pi-check version-chip-check"></i>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+
+      <div class="col-der">
+        <p-floatlabel variant="in">
+          <textarea pTextarea rows="6" cols="30" class="h-full" formControlName="mejoras"></textarea>
+          <label>Mejoras</label>
         </p-floatlabel>
         <p-floatlabel variant="in">
-          <p-select [options]="opcionesDestino" optionValue="value" optionLabel="label" formControlName="destino" />
-          <label>Tipo</label>
+          <textarea pTextarea rows="6" cols="30" class="h-full" formControlName="correcciones"></textarea>
+          <label>Correcciones</label>
         </p-floatlabel>
       </div>
 
-      <p-floatlabel variant="in">
-        <p-select [options]="opcionesEstado" optionValue="value" optionLabel="label" formControlName="estado" [appendTo]="'body'" />
-        <label>Estado</label>
-      </p-floatlabel>
-    </div>
-
-    <div class="der-form">
-      <p-floatlabel variant="in">
-        <textarea pTextarea rows="6" cols="30" class="h-full" formControlName="mejoras"></textarea>
-        <label>Mejoras</label>
-      </p-floatlabel>
-      <p-floatlabel variant="in">
-        <textarea pTextarea rows="6" cols="30" class="h-full" formControlName="correcciones"></textarea>
-        <label>Correcciones</label>
-      </p-floatlabel>
     </div>
   </form>
 
   <div class="botones">
     <p-button label="Cancelar" severity="secondary" (click)="mostrarmodalAddMod = false" />
     <p-button label="Guardar"  (click)="GuardarActualizacion()" />
+  </div>
+</p-dialog>
+
+<!-- Rollback de frontend: requiere versión destino + URL del ZIP del installer -->
+<p-dialog header="Rollback de frontend" [modal]="true" [(visible)]="rollbackFrontDialogVisible" [style]="{ width: '34rem' }">
+  @if (rollbackFrontTerminal) {
+    <p class="rollback-front-sub">
+      Terminal <strong>{{ GetTerminalCorta(rollbackFrontTerminal.terminal) }}</strong>
+      — {{ rollbackFrontTerminal.cliente }}
+      (front actual: {{ rollbackFrontTerminal.versionFront ?? '—' }})
+    </p>
+  }
+  <div class="campo">
+    <label>Versión destino</label>
+    <input pInputText [(ngModel)]="rollbackFrontVersion" placeholder="2.4.9" />
+  </div>
+  <div class="campo">
+    <label>URL del ZIP</label>
+    <input pInputText [(ngModel)]="rollbackFrontZipUrl"
+           placeholder="https://creationserver.com/downloads/easysales/frontend/update-2.4.9.zip" />
+  </div>
+  <div class="botones">
+    <p-button label="Cancelar" severity="secondary" (click)="rollbackFrontDialogVisible = false" />
+    <p-button label="Ordenar rollback" severity="danger"
+              [loading]="rollbackFrontEnProceso === rollbackFrontTerminal?.terminal"
+              (click)="ConfirmarRollbackFront()" />
   </div>
 </p-dialog>

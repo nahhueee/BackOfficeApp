@@ -2,7 +2,6 @@ import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { RadioButtonModule } from 'primeng/radiobutton';
-import {MatIconModule} from '@angular/material/icon';
 import { TooltipModule } from 'primeng/tooltip';
 import { updatePreset } from '@primeuix/themes';
 import { IndigoPreset } from '../../themes/indigo';
@@ -26,7 +25,6 @@ interface Color{
     ButtonModule,
     PopoverModule,
     RadioButtonModule,
-    MatIconModule,
     TooltipModule
   ],
   templateUrl: './navegacion.html',

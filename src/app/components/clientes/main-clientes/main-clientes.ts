@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { Cliente } from '../../../models/Cliente';
-import { MatIconModule } from '@angular/material/icon';
 import { Button } from 'primeng/button';
 import { ClientesService } from '../../../services/clientes.service';
 import { FiltroGral } from '../../../models/Filtros';
@@ -19,7 +18,6 @@ import { PopoverModule } from 'primeng/popover';
   imports: [
     TableModule,
     TagModule,
-    MatIconModule,
     Button,
     DatePipe,
     Dialog,

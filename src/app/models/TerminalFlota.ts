@@ -11,7 +11,11 @@ export class TerminalFlota {
     erroresRecientes?:     number;
     terminalesLanActivas?: number;
     totalErrores?:         number;
-    ultimoEvento?:         { tipo: string; version: string | null; fecha: Date | null } | null;
+    // Último evento de update de cada capa (back y front son streams independientes).
+    ultimoEventoBack?:     { tipo: string; version: string | null; fecha: Date | null } | null;
+    ultimoEventoFront?:    { tipo: string; version: string | null; error: string | null; maquina: string | null; fecha: Date | null } | null;
+    esCanary?:                   boolean;
+    confirmacionFrontPendiente?: boolean;
     totalBackups?:              number;
     ultimoBackup?:              Date | null;
     ultimoBackupFecha?:         Date | null;
@@ -33,11 +37,20 @@ export class TerminalFlota {
             this.erroresRecientes     = data.errores_recientes;
             this.terminalesLanActivas = data.terminales_lan_activas;
             this.totalErrores         = data.total_errores;
-            this.ultimoEvento         = data.evento_tipo ? {
-                tipo:    data.evento_tipo,
-                version: data.evento_version ?? null,
-                fecha:   data.evento_fecha ? new Date(data.evento_fecha) : null,
+            this.ultimoEventoBack     = data.evento_back_tipo ? {
+                tipo:    data.evento_back_tipo,
+                version: data.evento_back_version ?? null,
+                fecha:   data.evento_back_fecha ? new Date(data.evento_back_fecha) : null,
             } : null;
+            this.ultimoEventoFront    = data.evento_front_tipo ? {
+                tipo:    data.evento_front_tipo,
+                version: data.evento_front_version ?? null,
+                error:   data.evento_front_error ?? null,
+                maquina: data.evento_front_maquina ?? null,
+                fecha:   data.evento_front_fecha ? new Date(data.evento_front_fecha) : null,
+            } : null;
+            this.esCanary                  = data.es_canary === 1 || data.es_canary === true;
+            this.confirmacionFrontPendiente = data.confirmacion_front_pendiente === 1 || data.confirmacion_front_pendiente === true;
             this.totalBackups            = data.total_backups ?? 0;
             this.ultimoBackup            = data.ultimo_backup ? new Date(data.ultimo_backup) : null;
             this.ultimoBackupFecha       = data.ultimo_backup_fecha ? new Date(data.ultimo_backup_fecha) : null;

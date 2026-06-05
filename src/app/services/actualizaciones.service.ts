@@ -14,6 +14,14 @@ export class ActualizacionesService {
   ObtenerActalizaciones(filtro:FiltroActualizacion): Observable<any> {
     return this.apiService.post('actualizaciones/obtener', filtro)
   }
+
+  ObtenerVersionesBackend(idApp: number): Observable<any> {
+    return this.apiService.get(`actualizaciones/versiones-backend/${idApp}`)
+  }
+
+  ObtenerCompatibilidades(idApp: number, versionFrontend: string): Observable<string[] | any> {
+    return this.apiService.get(`actualizaciones/compatibilidades/${idApp}/${versionFrontend}`)
+  }
   //#endregion
 
   //#region ABM

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { App } from '../../../models/App';
 import { AplicacionesService } from '../../../services/aplicaciones.service';
@@ -15,12 +15,26 @@ import { NotificacionesService } from '../../../services/notificaciones.service'
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmPopup } from 'primeng/confirmpopup';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { TerminalFlota } from '../../../models/TerminalFlota';
 import { CommonModule } from '@angular/common';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
+import { ErroresService } from '../../../services/errores.service';
+import { ErrorAgregado, ErrorDetalle } from '../../../models/ErrorAgregado';
+import { getSeveridadTag, getSeveridadLabel } from '../../../models/errores.const';
+import {
+  GetHeartbeatSeverity, GetHeartbeatLabel,
+  FormatearTiempoActivo,
+  GetEventoSeverity, GetEventoLabel,
+  GetEventoFrontSeverity, GetEventoFrontLabel,
+  GetBackupEstado, GetBackupSeverity, GetBackupLabel, GetBackupTooltip,
+  GetTerminalCorta,
+  GetBackupSeverityFromEstado, GetBackupLabelFromEstado, GetInstalacionHeartbeatLabel,
+  agruparPorInstalacion,
+  type InstalacionFlota,
+} from '../../../services/flota.util';
 
 @Component({
   selector: 'app-detalle-aplicacion',
@@ -34,20 +48,19 @@ import { CommonModule } from '@angular/common';
     TableModule,
     ConfirmPopup,
     ToggleSwitchModule,
-    SelectButtonModule,
     SelectModule,
     TagModule,
     TooltipModule,
+    Tabs, TabList, Tab, TabPanels, TabPanel,
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, ErroresService],
   templateUrl: './detalle-aplicacion.html',
   styleUrl: './detalle-aplicacion.scss'
 })
-export class DetalleAplicacion {
+export class DetalleAplicacion implements OnInit {
   app: App = new App();
   idApp: number = 0;
   mostrarmodalAddMod: boolean = false;
-  decimal_mask: any;
 
   // Actualizaciones
   filtroActual: FiltroActualizacion = new FiltroActualizacion();
@@ -58,42 +71,121 @@ export class DetalleAplicacion {
   actualizacionSeleccionada: Actualizacion = new Actualizacion();
   formActualizacion: FormGroup;
 
-  opcionesDestino = [
-    { label: 'Frontend', value: 'frontend' },
-    { label: 'Backend',  value: 'backend'  }
-  ];
   opcionesEstado = [
     { label: '✏️ Borrador',      value: 'borrador'      },
     { label: '🐦 Canary',        value: 'canary'        },
     { label: '🚀 Producción',    value: 'produccion'    },
     { label: '❌ Deshabilitada', value: 'deshabilitada' }
   ];
-  opcionesAmbiente = [
-    { label: 'Test', value: 'test' },
-    { label: 'Prod', value: 'prod' }
-  ];
 
-  // Flota
+  // Versiones backend para el selector de compatibilidad de frontend
+  versionesBackendDisponibles: { version: string, estado: string }[] = [];
+  versionesBackendSeleccionadas: string[] = [];
+  loadingVersionesBackend: boolean = false;
+
+  // Flota — datos crudos del backend
   flota: TerminalFlota[] = [];
   loadingFlota: boolean = false;
-  rollbackEnProceso: string | null = null;  // terminal UUID en proceso de rollback
+  rollbackEnProceso: string | null = null;
+  rollbackFrontEnProceso: string | null = null;
+
+  // Diálogo de rollback de front (requiere versión destino + URL del ZIP)
+  rollbackFrontDialogVisible = false;
+  rollbackFrontTerminal: TerminalFlota | null = null;
+  rollbackFrontVersion = '';
+  rollbackFrontZipUrl  = '';
+
+  // Flota — agrupada y filtrada (lo que muestra la tabla)
+  instalaciones:          InstalacionFlota[] = [];
+  instalacionesFiltradas: InstalacionFlota[] = [];
+  expandedRows: { [dni: number]: boolean } = {};
+
+  // Filtros de flota
+  filtroBusqueda:  string = '';
+  filtroHeartbeat: string = 'todos';
+  filtroBackup:    string = 'todos';
+  filtroErrores:   string = 'todos';
+  filtroVersion:   string = 'todos';
+  filtroEstado:    string = 'todas';
+
+  opcionesHeartbeatFlota = [
+    { label: 'Heartbeat',    value: 'todos'     },
+    { label: 'Online',       value: 'ok'        },
+    { label: 'Sin contacto', value: 'problemas' },
+  ];
+  opcionesBackupFlota = [
+    { label: 'Backup',          value: 'todos'     },
+    { label: 'OK',              value: 'ok'        },
+    { label: 'Con problemas',   value: 'problemas' },
+  ];
+  opcionesErroresFlota = [
+    { label: 'Errores',     value: 'todos'      },
+    { label: 'Con errores', value: 'con_errores' },
+  ];
+  opcionesVersionFlota = [
+    { label: 'Versión',        value: 'todos'        },
+    { label: 'Al día',         value: 'al_dia'       },
+    { label: 'Desactualizada', value: 'desactualizada' },
+  ];
+  opcionesEstadoFlota = [
+    { label: 'Estado',    value: 'todas'     },
+    { label: 'Activas',   value: 'activas'   },
+    { label: 'Bloqueadas', value: 'bloqueadas' },
+  ];
+
+  // Funciones de dominio de flota (del util, expuestas para el template)
+  GetHeartbeatSeverity          = GetHeartbeatSeverity;
+  GetHeartbeatLabel             = GetHeartbeatLabel;
+  FormatearTiempoActivo         = FormatearTiempoActivo;
+  GetEventoSeverity             = GetEventoSeverity;
+  GetEventoLabel                = GetEventoLabel;
+  GetEventoFrontSeverity        = GetEventoFrontSeverity;
+  GetEventoFrontLabel           = GetEventoFrontLabel;
+  GetBackupEstado               = GetBackupEstado;
+  GetBackupSeverity             = GetBackupSeverity;
+  GetBackupLabel                = GetBackupLabel;
+  GetBackupTooltip              = GetBackupTooltip;
+  GetTerminalCorta              = GetTerminalCorta;
+  GetBackupSeverityFromEstado   = GetBackupSeverityFromEstado;
+  GetBackupLabelFromEstado      = GetBackupLabelFromEstado;
+  GetInstalacionHeartbeatLabel  = GetInstalacionHeartbeatLabel;
+
+  // Errores recurrentes
+  errores:           ErrorAgregado[] = [];
+  loadingErrores:    boolean = false;
+  detalleErrores:    ErrorDetalle[] = [];
+  loadingDetalle:    boolean = false;
+  errorSeleccionado: ErrorAgregado | null = null;
+  mostrarDetalle:    boolean = false;
+
+  getSeveridadTag   = getSeveridadTag;
+  getSeveridadLabel = getSeveridadLabel;
 
   constructor(
     private rutaActiva: ActivatedRoute,
     private aplicacionesService: AplicacionesService,
     private actualizacionesService: ActualizacionesService,
+    private erroresService: ErroresService,
     private Notificaciones: NotificacionesService,
     private confirmationService: ConfirmationService,
   ) {
     this.formActualizacion = new FormGroup({
-      resumen:      new FormControl('', [Validators.required]),
-      mejoras:      new FormControl(''),
-      correcciones: new FormControl(''),
-      version:      new FormControl('', [Validators.required]),
-      link:         new FormControl('', [Validators.required]),
-      ambiente:     new FormControl(''),
-      estado:       new FormControl('', [Validators.required]),
-      destino:      new FormControl('', [Validators.required]),
+      resumen:           new FormControl('', [Validators.required]),
+      mejoras:           new FormControl(''),
+      correcciones:      new FormControl(''),
+      version:           new FormControl('', [Validators.required]),
+      link:              new FormControl('', [Validators.required]),
+      estado:            new FormControl('', [Validators.required]),
+      destino:           new FormControl('', [Validators.required]),
+      requiereNpmInstall: new FormControl(false),
+      tamanoBytes:       new FormControl<number | null>(null),
+    });
+
+    // Cuando el tipo cambia a 'frontend', cargar versiones backend disponibles
+    this.formActualizacion.get('destino')?.valueChanges.subscribe((tipo: string) => {
+      if (tipo === 'frontend' && this.idApp) {
+        this.CargarVersionesBackend();
+      }
     });
   }
 
@@ -102,15 +194,14 @@ export class DetalleAplicacion {
     return !!(control && control.invalid && control.dirty);
   }
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.idApp = this.rutaActiva.snapshot.params['idApp'];
-      if (this.idApp != 0) {
-        this.ObtenerApp();
-        this.BuscarActualizaciones();
-        this.CargarFlota();
-      }
-    });
+  ngOnInit() {
+    this.idApp = this.rutaActiva.snapshot.params['idApp'];
+    if (this.idApp != 0) {
+      this.ObtenerApp();
+      this.BuscarActualizaciones();
+      this.CargarFlota();
+      this.CargarErrores();
+    }
   }
 
   ObtenerApp() {
@@ -145,24 +236,39 @@ export class DetalleAplicacion {
     this.modificandoActualizacion = false;
     this.formActualizacion.reset();
     this.actualizacionSeleccionada = new Actualizacion();
-    this.formActualizacion.patchValue({ ambiente: 'test', destino: 'backend', estado: 'borrador' });
+    this.versionesBackendSeleccionadas = [];
+    this.versionesBackendDisponibles = [];
+    this.formActualizacion.patchValue({ destino: 'backend', estado: 'borrador', requiereNpmInstall: false });
     this.mostrarmodalAddMod = true;
   }
 
   EditarActualizacion(idActualizacion: number) {
     this.modificandoActualizacion = true;
     this.actualizacionSeleccionada = this.actualizaciones.find(a => a.id == idActualizacion)!;
+    const act = this.actualizacionSeleccionada;
+
     this.formActualizacion.reset();
+    this.versionesBackendSeleccionadas = [];
+    this.versionesBackendDisponibles = [];
+
     this.formActualizacion.patchValue({
-      resumen:      this.actualizacionSeleccionada.resumen,
-      mejoras:      this.actualizacionSeleccionada.mejoras,
-      correcciones: this.actualizacionSeleccionada.correcciones,
-      version:      this.actualizacionSeleccionada.version,
-      link:         this.actualizacionSeleccionada.link,
-      destino:      this.actualizacionSeleccionada.tipo,
-      estado:       this.actualizacionSeleccionada.estado,
-      ambiente:     this.actualizacionSeleccionada.ambiente,
+      resumen:            act.resumen,
+      mejoras:            act.mejoras,
+      correcciones:       act.correcciones,
+      version:            act.version,
+      link:               act.link,
+      destino:            act.tipo,
+      estado:             act.estado,
+      requiereNpmInstall: (act.requiere_npm_install ?? 0) === 1,
+      tamanoBytes:        act.tamano_bytes ?? null,
     });
+
+    // Si es frontend, cargar compatibilidades previas (versiones ya se cargan via valueChanges)
+    if (act.tipo === 'frontend' && act.version) {
+      this.actualizacionesService.ObtenerCompatibilidades(this.idApp, act.version)
+        .subscribe(versiones => { this.versionesBackendSeleccionadas = versiones ?? []; });
+    }
+
     this.mostrarmodalAddMod = true;
   }
 
@@ -201,9 +307,15 @@ export class DetalleAplicacion {
     nueva.version      = this.formActualizacion.value.version;
     nueva.estado       = this.formActualizacion.value.estado;
     nueva.link         = this.formActualizacion.value.link;
-    nueva.ambiente     = this.formActualizacion.value.ambiente ?? 'prod';
     nueva.tipo         = this.formActualizacion.value.destino;
     nueva.fechaPublicacion = new Date();
+
+    if (nueva.tipo === 'backend') {
+      nueva.requiereNpmInstall = this.formActualizacion.value.requiereNpmInstall ?? false;
+      nueva.tamanoBytes        = this.formActualizacion.value.tamanoBytes ?? null;
+    } else {
+      nueva.versionesBackendCompatibles = this.versionesBackendSeleccionadas;
+    }
 
     const obs = this.modificandoActualizacion
       ? this.actualizacionesService.Modificar(nueva)
@@ -239,6 +351,44 @@ export class DetalleAplicacion {
     }
   }
 
+  // ─── Selector de tipo y compatibilidades ─────────────────────────────────
+
+  setTipo(tipo: string) {
+    this.formActualizacion.patchValue({ destino: tipo });
+  }
+
+  CargarVersionesBackend() {
+    this.loadingVersionesBackend = true;
+    this.actualizacionesService.ObtenerVersionesBackend(this.idApp).subscribe({
+      next: (versiones) => {
+        this.versionesBackendDisponibles = versiones ?? [];
+        this.loadingVersionesBackend = false;
+      },
+      error: () => { this.loadingVersionesBackend = false; }
+    });
+  }
+
+  esVersionSeleccionada(version: string): boolean {
+    return this.versionesBackendSeleccionadas.includes(version);
+  }
+
+  toggleVersionBackend(version: string) {
+    const idx = this.versionesBackendSeleccionadas.indexOf(version);
+    if (idx >= 0) {
+      this.versionesBackendSeleccionadas = this.versionesBackendSeleccionadas.filter(v => v !== version);
+    } else {
+      this.versionesBackendSeleccionadas = [...this.versionesBackendSeleccionadas, version];
+    }
+  }
+
+  get tamanoEnMB(): string | null {
+    const bytes = this.formActualizacion.get('tamanoBytes')?.value;
+    if (!bytes || bytes <= 0) return null;
+    if (bytes >= 1_048_576) return `≈ ${(bytes / 1_048_576).toFixed(1)} MB`;
+    if (bytes >= 1024) return `≈ ${(bytes / 1024).toFixed(0)} KB`;
+    return `${bytes} bytes`;
+  }
+
   // ─── Flota ───────────────────────────────────────────────────────────────
 
   CargarFlota() {
@@ -248,109 +398,141 @@ export class DetalleAplicacion {
     this.aplicacionesService.ObtenerFlota(this.idApp).subscribe({
       next: (rows: any[]) => {
         this.flota        = rows.map(r => new TerminalFlota(r));
+        this.instalaciones = agruparPorInstalacion(this.flota);
+        this.aplicarFiltros();
         this.loadingFlota = false;
       },
       error: () => { this.loadingFlota = false; }
     });
   }
 
-  GetHeartbeatSeverity(fecha: Date | null | undefined): 'success' | 'warn' | 'danger' | 'secondary' {
-    if (!fecha) return 'secondary';
-    const minutos = (Date.now() - new Date(fecha).getTime()) / 60000;
-    if (minutos < 15) return 'success';
-    if (minutos < 60) return 'warn';
-    return 'danger';
-  }
+  aplicarFiltros() {
+    let resultado = this.instalaciones;
 
-  GetHeartbeatLabel(fecha: Date | null | undefined): string {
-    if (!fecha) return 'Sin datos';
-    const minutos = Math.floor((Date.now() - new Date(fecha).getTime()) / 60000);
-    if (minutos < 1)  return 'Ahora';
-    if (minutos < 60) return `Hace ${minutos} min`;
-    const horas = Math.floor(minutos / 60);
-    if (horas < 24)   return `Hace ${horas}h`;
-    return `Hace ${Math.floor(horas / 24)}d`;
-  }
-
-  FormatearTiempoActivo(segundos: number | null | undefined): string {
-    if (segundos == null) return '—';
-    if (segundos < 60)    return `${segundos}s`;
-    const m = Math.floor(segundos / 60);
-    if (m < 60)           return `${m}m`;
-    const h = Math.floor(m / 60);
-    const rm = m % 60;
-    if (h < 24)           return rm > 0 ? `${h}h ${rm}m` : `${h}h`;
-    const d = Math.floor(h / 24);
-    const rh = h % 24;
-    return rh > 0 ? `${d}d ${rh}h` : `${d}d`;
-  }
-
-  GetEventoSeverity(tipo: string | undefined): 'success' | 'danger' | 'warn' | 'secondary' {
-    switch (tipo) {
-      case 'aplicacion_exitosa': return 'success';
-      case 'rollback_exitoso':   return 'warn';
-      case 'aplicacion_fallida':
-      case 'rollback_fallido':   return 'danger';
-      default:                   return 'secondary';
+    if (this.filtroBusqueda.trim()) {
+      const term = this.filtroBusqueda.toLowerCase();
+      resultado = resultado.filter(i => i.nombre.toLowerCase().includes(term));
     }
-  }
 
-  GetEventoLabel(tipo: string | undefined): string {
-    switch (tipo) {
-      case 'aplicacion_exitosa': return 'Actualizado';
-      case 'aplicacion_fallida': return 'Falló update';
-      case 'rollback_exitoso':   return 'Revertido';
-      case 'rollback_fallido':   return 'Falló rollback';
-      default:                   return tipo ?? '—';
+    if (this.filtroHeartbeat !== 'todos') {
+      resultado = resultado.filter(i => {
+        const ok = i.heartbeatSeverity !== 'danger';
+        return this.filtroHeartbeat === 'ok' ? ok : !ok;
+      });
     }
-  }
 
-  GetBackupEstado(t: TerminalFlota): 'sin_backup' | 'desactualizado' | 'generacion_fallida' | 'corrupto' | 'pendiente' | 'ok' {
-    if (!t.ultimoBackup || (t.totalBackups ?? 0) === 0) return 'sin_backup';
-    const dias = (Date.now() - new Date(t.ultimoBackup).getTime()) / (1000 * 60 * 60 * 24);
-    if (dias > 7)                                    return 'desactualizado';
-    if (t.ultimoBackupOk === false)                  return 'generacion_fallida';
-    if (t.backupValidacionEstado === 'corrupto')     return 'corrupto';
-    if (t.backupValidacionEstado === 'pendiente')    return 'pendiente';
-    return 'ok';
-  }
-
-  GetBackupSeverity(t: TerminalFlota): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
-    switch (this.GetBackupEstado(t)) {
-      case 'ok':                 return 'success';
-      case 'pendiente':          return 'info';
-      case 'desactualizado':     return 'warn';
-      case 'generacion_fallida': return 'danger';
-      case 'corrupto':           return 'danger';
-      case 'sin_backup':         return 'secondary';
+    if (this.filtroBackup !== 'todos') {
+      resultado = resultado.filter(i => {
+        const ok = ['ok', 'pendiente'].includes(i.backupEstado);
+        return this.filtroBackup === 'ok' ? ok : !ok;
+      });
     }
-  }
 
-  GetBackupLabel(t: TerminalFlota): string {
-    switch (this.GetBackupEstado(t)) {
-      case 'ok':                 return `${t.totalBackups}/3`;
-      case 'pendiente':          return 'Validando';
-      case 'desactualizado':     return 'Desactualizado';
-      case 'generacion_fallida': return 'Error generación';
-      case 'corrupto':           return 'Corrupto';
-      case 'sin_backup':         return 'Sin backup';
+    if (this.filtroErrores === 'con_errores') {
+      resultado = resultado.filter(i => i.totalErrores > 0);
     }
-  }
 
-  GetBackupTooltip(t: TerminalFlota): string {
-    const estado = this.GetBackupEstado(t);
-    if (estado === 'sin_backup') return 'No se recibieron backups';
-    if (estado === 'corrupto' && t.backupValidacionDetalle) return t.backupValidacionDetalle;
-    if (t.ultimoBackup) {
-      const d = new Date(t.ultimoBackup);
-      return `Último: ${d.toLocaleDateString('es-AR')}`;
+    if (this.filtroVersion !== 'todos' && this.app.versionBackend) {
+      resultado = resultado.filter(i => {
+        const alDia = i.versionBack === this.app.versionBackend;
+        return this.filtroVersion === 'al_dia' ? alDia : !alDia;
+      });
     }
-    return '';
+
+    if (this.filtroEstado === 'activas') {
+      resultado = resultado.filter(i => i.habilitado);
+    } else if (this.filtroEstado === 'bloqueadas') {
+      resultado = resultado.filter(i => !i.habilitado);
+    }
+
+    this.instalacionesFiltradas = resultado;
   }
 
-  GetTerminalCorta(terminal: string | undefined): string {
-    if (!terminal) return '—';
-    return terminal.length > 8 ? terminal.slice(0, 8) + '…' : terminal;
+  toggleRow(inst: InstalacionFlota) {
+    this.expandedRows = {
+      ...this.expandedRows,
+      [inst.DNI]: !this.expandedRows[inst.DNI]
+    };
+  }
+
+  limpiarFiltros() {
+    this.filtroBusqueda  = '';
+    this.filtroHeartbeat = 'todos';
+    this.filtroBackup    = 'todos';
+    this.filtroErrores   = 'todos';
+    this.filtroVersion   = 'todos';
+    this.filtroEstado    = 'todas';
+    this.aplicarFiltros();
+  }
+
+  get hayFiltrosActivos(): boolean {
+    return this.filtroBusqueda.trim() !== ''
+      || this.filtroHeartbeat !== 'todos'
+      || this.filtroBackup    !== 'todos'
+      || this.filtroErrores   !== 'todos'
+      || this.filtroVersion   !== 'todos'
+      || this.filtroEstado    !== 'todas';
+  }
+
+  // ─── KPIs (por instalación, no por terminal) ──────────────────────────────
+
+  get kpiTotal(): number {
+    return this.app.clientes ?? 0;
+  }
+
+  get kpiActivas(): number {
+    return this.instalaciones.filter(i => i.habilitado && i.heartbeatSeverity !== 'danger').length;
+  }
+
+  get kpiAlDia(): number {
+    if (!this.app.versionBackend) return 0;
+    return this.instalaciones.filter(i => i.versionBack === this.app.versionBackend).length;
+  }
+
+  get kpiAlertas(): number {
+    return this.instalaciones.filter(i =>
+      i.heartbeatSeverity === 'danger' ||
+      !['ok', 'pendiente'].includes(i.backupEstado) ||
+      i.totalErrores > 0
+    ).length;
+  }
+
+  get kpiBackupsOk(): number {
+    return this.instalaciones.filter(i => i.backupEstado === 'ok').length;
+  }
+
+  // ─── Errores recurrentes ─────────────────────────────────────────────────
+
+  CargarErrores() {
+    if (this.idApp == 0) return;
+    this.loadingErrores = true;
+    this.erroresService.ObtenerErroresAgregados(this.idApp).subscribe({
+      next: (rows) => {
+        this.errores       = rows;
+        this.loadingErrores = false;
+      },
+      error: () => { this.loadingErrores = false; }
+    });
+  }
+
+  VerDetalleError(error: ErrorAgregado) {
+    this.errorSeleccionado = error;
+    this.mostrarDetalle    = true;
+    this.loadingDetalle    = true;
+    this.detalleErrores    = [];
+
+    this.erroresService.ObtenerDetalleError(this.idApp, error.codigo).subscribe({
+      next: (rows) => {
+        this.detalleErrores  = rows;
+        this.loadingDetalle  = false;
+      },
+      error: () => { this.loadingDetalle = false; }
+    });
+  }
+
+  FormatearFecha(fecha: Date | null): string {
+    if (!fecha) return '—';
+    return new Date(fecha).toLocaleDateString('es-AR');
   }
 
   OrdenarRollback(event: Event, t: TerminalFlota) {
@@ -376,6 +558,39 @@ export class DetalleAplicacion {
             this.rollbackEnProceso = null;
           }
         });
+      }
+    });
+  }
+
+  // Rollback de FRONTEND: necesita versión destino + URL del ZIP del installer,
+  // por eso abre un diálogo en lugar de un confirm directo.
+  AbrirRollbackFront(t: TerminalFlota) {
+    this.rollbackFrontTerminal = t;
+    this.rollbackFrontVersion  = '';
+    this.rollbackFrontZipUrl   = '';
+    this.rollbackFrontDialogVisible = true;
+  }
+
+  ConfirmarRollbackFront() {
+    const t = this.rollbackFrontTerminal;
+    if (!t?.terminal) return;
+    const version = this.rollbackFrontVersion.trim();
+    const zipUrl  = this.rollbackFrontZipUrl.trim();
+    if (!version || !zipUrl) {
+      this.Notificaciones.Warn('Versión destino y URL del ZIP son requeridas.');
+      return;
+    }
+
+    this.rollbackFrontEnProceso = t.terminal;
+    this.aplicacionesService.OrdenarRollbackFront(t.terminal, this.idApp, version, zipUrl).subscribe({
+      next: () => {
+        this.Notificaciones.Success('Rollback de front ordenado. La terminal lo aplicará en el próximo heartbeat.');
+        this.rollbackFrontEnProceso = null;
+        this.rollbackFrontDialogVisible = false;
+      },
+      error: () => {
+        this.Notificaciones.Error('No se pudo ordenar el rollback de front.');
+        this.rollbackFrontEnProceso = null;
       }
     });
   }

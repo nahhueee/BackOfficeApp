@@ -27,5 +27,12 @@ export class AplicacionesService {
   CancelarRollback(terminal:string, idApp:number): Observable<any> {
     return this.apiService.delete(`appscliente/rollback/${terminal}/${idApp}`)
   }
+
+  OrdenarRollbackFront(terminal:string, idApp:number, versionDestino:string, zipUrl:string): Observable<any> {
+    return this.apiService.post('appscliente/rollback-front', { terminal, idApp, versionDestino, zipUrl })
+  }
+  CancelarRollbackFront(terminal:string, idApp:number): Observable<any> {
+    return this.apiService.delete(`appscliente/rollback-front/${terminal}/${idApp}`)
+  }
   //#endregion
 }
